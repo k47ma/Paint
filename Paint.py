@@ -12,8 +12,10 @@ class Paint(Tk):
     def __init__(self):
         Tk.__init__(self)
 
+        self.iconbitmap(r'image\paint.ico')
         self.wm_title("Paint")
         self.geometry("700x500")
+        self.minsize(700, 500)
 
         canvas_panel = PaintCanvas(self)
         control_frame = ControlFrame(self, canvas_panel)
@@ -30,33 +32,35 @@ class ControlFrame(Frame):
         self.types = {}
         self.cursors = {}
 
-        pencil_btn = Button(self, text="pencil", command=lambda: self.select("pencil"))
-        pencil_btn.pack(side=TOP, pady=5)
+        self.pencil_img = PhotoImage(file="image\pencil.gif")
+        pencil_btn = Button(self, image=self.pencil_img, command=lambda: self.select("pencil"))
+        pencil_btn.pack(side=TOP)
         self.types["pencil"] = pencil_btn
         self.cursors["pencil"] = "ul_angle"
 
-        eraser_btn = Button(self, text="eraser", command=lambda: self.select("eraser"))
-        eraser_btn.pack(side=TOP, pady=5)
+        self.eraser_img = PhotoImage(file="image\eraser.gif")
+        eraser_btn = Button(self, image=self.eraser_img, command=lambda: self.select("eraser"))
+        eraser_btn.pack(side=TOP)
         self.types["eraser"] = eraser_btn
         self.cursors["eraser"] = "target"
 
         line_btn = Button(self, text="line", command=lambda: self.select("line"))
-        line_btn.pack(side=TOP, pady=5)
+        line_btn.pack(side=TOP)
         self.types["line"] = line_btn
         self.cursors["line"] = "plus"
 
         rect_btn = Button(self, text="rect", command=lambda: self.select("rect"))
-        rect_btn.pack(side=TOP, pady=5)
+        rect_btn.pack(side=TOP)
         self.types["rect"] = rect_btn
         self.cursors["rect"] = "tcross"
 
         circle_btn = Button(self, text="circle", command=lambda: self.select("circle"))
-        circle_btn.pack(side=TOP, pady=5)
+        circle_btn.pack(side=TOP)
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
         clear_btn = Button(self, text="clear", command=lambda: self.canvas.clear())
-        clear_btn.pack(side=TOP, pady=5)
+        clear_btn.pack(side=TOP)
 
         self.select("pencil")
 
