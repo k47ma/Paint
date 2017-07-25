@@ -32,35 +32,39 @@ class ControlFrame(Frame):
         self.types = {}
         self.cursors = {}
 
-        self.pencil_img = PhotoImage(file="image\pencil.gif")
+        self.pencil_img = PhotoImage(file="image\\pencil.gif")
         pencil_btn = Button(self, image=self.pencil_img, command=lambda: self.select("pencil"))
         pencil_btn.pack(side=TOP)
         self.types["pencil"] = pencil_btn
         self.cursors["pencil"] = "ul_angle"
 
-        self.eraser_img = PhotoImage(file="image\eraser.gif")
+        self.eraser_img = PhotoImage(file="image\\eraser.gif")
         eraser_btn = Button(self, image=self.eraser_img, command=lambda: self.select("eraser"))
         eraser_btn.pack(side=TOP)
         self.types["eraser"] = eraser_btn
         self.cursors["eraser"] = "target"
 
-        line_btn = Button(self, text="line", command=lambda: self.select("line"))
+        self.line_img = PhotoImage(file="image\\line.gif")
+        line_btn = Button(self, image=self.line_img, command=lambda: self.select("line"))
         line_btn.pack(side=TOP)
         self.types["line"] = line_btn
         self.cursors["line"] = "plus"
 
-        rect_btn = Button(self, text="rect", command=lambda: self.select("rect"))
+        self.rect_img = PhotoImage(file="image\\rect.gif")
+        rect_btn = Button(self, image=self.rect_img, command=lambda: self.select("rect"))
         rect_btn.pack(side=TOP)
         self.types["rect"] = rect_btn
         self.cursors["rect"] = "tcross"
 
-        circle_btn = Button(self, text="circle", command=lambda: self.select("circle"))
+        self.oval_img = PhotoImage(file="image\\oval.gif")
+        circle_btn = Button(self, image=self.oval_img, command=lambda: self.select("circle"))
         circle_btn.pack(side=TOP)
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
-        clear_btn = Button(self, text="clear", command=lambda: self.canvas.clear())
-        clear_btn.pack(side=TOP)
+        self.clear_img = PhotoImage(file="image\\cross.gif")
+        clear_btn = Button(self, image=self.clear_img, command=lambda: self.canvas.clear())
+        clear_btn.pack(side=TOP, pady=5)
 
         self.select("pencil")
 
