@@ -13,6 +13,7 @@ class Paint(Tk):
         Tk.__init__(self)
 
         self.wm_title("Paint")
+        self.geometry("700x500")
 
         canvas_panel = PaintCanvas(self)
         control_frame = ControlFrame(self, canvas_panel)
