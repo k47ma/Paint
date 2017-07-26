@@ -1,5 +1,6 @@
 from tkinter import *
 from config import *
+from math import *
 
 
 # frame for canvas
@@ -64,11 +65,33 @@ class PaintCanvas(Canvas):
             self.delete(self.lastDraw)
 
         if event.state == SHIFT:
-            self.lastDraw = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
-                                             width=settings["LINE_WIDTH"])
+            # avoid "divided by 0" error
+            if event.x == self.lastX:
+                self.lastDraw = self.create_line((self.lastX, self.lastY, self.lastX, event.y), fill=settings["COLOR"],
+                                                 width=settings["LINE_WIDTH"], capstyle=ROUND)
+                return
+
+            slope = float((event.y - self.lastY) / (event.x - self.lastX))
+
+            if slope >= tan(radians(67.5)) or slope < tan(radians(112.5)):
+                self.lastDraw = self.create_line((self.lastX, self.lastY, self.lastX, event.y), fill=settings["COLOR"],
+                                                 width=settings["LINE_WIDTH"], capstyle=ROUND)
+            elif tan(radians(-22.5)) <= slope < tan(radians(22.5)):
+                self.lastDraw = self.create_line((self.lastX, self.lastY, event.x, self.lastY), fill=settings["COLOR"],
+                                                 width=settings["LINE_WIDTH"], capstyle=ROUND)
+            elif tan(radians(22.5)) <= slope < tan(radians(67.5)):
+                end_x = int(round((self.lastX + event.x - self.lastY + event.y) / 2))
+                end_y = int(round((event.x - self.lastX + event.y + self.lastY) / 2))
+                self.lastDraw = self.create_line((self.lastX, self.lastY, end_x, end_y), fill=settings["COLOR"],
+                                                 width=settings["LINE_WIDTH"], capstyle=ROUND)
+            else:
+                end_x = int(round((self.lastX + event.x + self.lastY - event.y) / 2))
+                end_y = int(round((self.lastX - event.x + self.lastY + event.y) / 2))
+                self.lastDraw = self.create_line((self.lastX, self.lastY, end_x, end_y), fill=settings["COLOR"],
+                                                 width=settings["LINE_WIDTH"], capstyle=ROUND)
         else:
             self.lastDraw = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
-                                             width=settings["LINE_WIDTH"])
+                                             width=settings["LINE_WIDTH"], capstyle=ROUND)
 
     def addRect(self, event):
         if self.lastDraw:
