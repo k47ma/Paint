@@ -1,5 +1,6 @@
 from tkinter import *
 import tkColorChooser
+from Tooltip import Tooltip
 
 
 # constants for event status
@@ -36,48 +37,56 @@ class ControlFrame(Frame):
         self.cursors = {}
 
         self.pencil_img = PhotoImage(file="image\\pencil.gif")
-        pencil_btn = Button(self, image=self.pencil_img, command=lambda: self.select("pencil"))
+        pencil_btn = Button(self, image=self.pencil_img, cursor="hand2", command=lambda: self.select("pencil"))
         pencil_btn.pack(side=TOP)
+        self.create_tooltip(pencil_btn, "pencil")
         self.types["pencil"] = pencil_btn
         self.cursors["pencil"] = "ul_angle"
 
         self.brush_img = PhotoImage(file="image\\brush.gif")
-        brush_img = Button(self, image=self.brush_img, command=lambda: self.select("brush"))
-        brush_img.pack(side=TOP)
-        self.types["brush"] = brush_img
+        brush_btn = Button(self, image=self.brush_img, cursor="hand2", command=lambda: self.select("brush"))
+        brush_btn.pack(side=TOP)
+        self.create_tooltip(brush_btn, "brush")
+        self.types["brush"] = brush_btn
         self.cursors["brush"] = "target"
 
         self.eraser_img = PhotoImage(file="image\\eraser.gif")
-        eraser_btn = Button(self, image=self.eraser_img, command=lambda: self.select("eraser"))
+        eraser_btn = Button(self, image=self.eraser_img, cursor="hand2", command=lambda: self.select("eraser"))
         eraser_btn.pack(side=TOP)
+        self.create_tooltip(eraser_btn, "eraser")
         self.types["eraser"] = eraser_btn
         self.cursors["eraser"] = "target"
 
         self.line_img = PhotoImage(file="image\\line.gif")
-        line_btn = Button(self, image=self.line_img, command=lambda: self.select("line"))
+        line_btn = Button(self, image=self.line_img, cursor="hand2", command=lambda: self.select("line"))
         line_btn.pack(side=TOP)
+        self.create_tooltip(line_btn, "line")
         self.types["line"] = line_btn
         self.cursors["line"] = "plus"
 
         self.rect_img = PhotoImage(file="image\\rect.gif")
-        rect_btn = Button(self, image=self.rect_img, command=lambda: self.select("rect"))
+        rect_btn = Button(self, image=self.rect_img, cursor="hand2", command=lambda: self.select("rect"))
         rect_btn.pack(side=TOP)
+        self.create_tooltip(rect_btn, "rectangle")
         self.types["rect"] = rect_btn
         self.cursors["rect"] = "tcross"
 
         self.oval_img = PhotoImage(file="image\\oval.gif")
-        circle_btn = Button(self, image=self.oval_img, command=lambda: self.select("circle"))
+        circle_btn = Button(self, image=self.oval_img, cursor="hand2", command=lambda: self.select("circle"))
         circle_btn.pack(side=TOP)
+        self.create_tooltip(circle_btn, "oval")
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
         self.color_img = PhotoImage(file="image\\colors.gif")
-        color_btn = Button(self, image=self.color_img, command=self.selectColor)
+        color_btn = Button(self, image=self.color_img, cursor="hand2", command=self.selectColor)
         color_btn.pack(side=TOP, pady=6)
+        self.create_tooltip(color_btn, "select color")
 
         self.clear_img = PhotoImage(file="image\\cross.gif")
-        clear_btn = Button(self, image=self.clear_img, command=lambda: self.canvas.clear())
+        clear_btn = Button(self, image=self.clear_img, cursor="hand2", command=lambda: self.canvas.clear())
         clear_btn.pack(side=BOTTOM)
+        self.create_tooltip(clear_btn, "clear all")
 
         self.select("pencil")
 
@@ -95,6 +104,9 @@ class ControlFrame(Frame):
         selected_color = tkColorChooser.askcolor(COLOR, parent=self, title="Color Selector")
         if selected_color[1]:
             COLOR = selected_color[1]
+
+    def create_tooltip(self, widget, text):
+        Tooltip(widget, text)
 
 
 # frame for canvas
