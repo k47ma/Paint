@@ -32,7 +32,7 @@ class ControlFrame(Frame):
         eraser_btn.pack(side=TOP)
         self.create_tooltip(eraser_btn, "eraser")
         self.types["eraser"] = eraser_btn
-        self.cursors["eraser"] = "target"
+        self.cursors["eraser"] = "@eraser.cur"
 
         self.line_img = PhotoImage(file="image\\line.gif")
         line_btn = Button(self, image=self.line_img, cursor="hand2", command=lambda: self.select("line"))
