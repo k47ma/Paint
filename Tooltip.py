@@ -19,7 +19,7 @@ class Tooltip(object):
         self.root.wm_geometry("+%d+%d" % (x, y))
 
         label = Label(self.root, text=self.text, justify="left", bg="white", relief="solid", bd=1, font=("time", 9))
-        label.pack()
+        label.pack(ipadx=1)
 
     def leave(self, event):
         if self.root:

@@ -18,14 +18,14 @@ class ControlFrame(Frame):
         pencil_btn.pack(side=TOP)
         self.create_tooltip(pencil_btn, "pencil")
         self.types["pencil"] = pencil_btn
-        self.cursors["pencil"] = "ul_angle"
+        self.cursors["pencil"] = "@pencil.cur"
 
         self.brush_img = PhotoImage(file="image\\brush.gif")
         brush_btn = Button(self, image=self.brush_img, cursor="hand2", command=lambda: self.select("brush"))
         brush_btn.pack(side=TOP)
         self.create_tooltip(brush_btn, "brush")
         self.types["brush"] = brush_btn
-        self.cursors["brush"] = "target"
+        self.cursors["brush"] = "@brush.cur"
 
         self.eraser_img = PhotoImage(file="image\\eraser.gif")
         eraser_btn = Button(self, image=self.eraser_img, cursor="hand2", command=lambda: self.select("eraser"))
