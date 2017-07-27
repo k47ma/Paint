@@ -55,6 +55,11 @@ class ControlFrame(Frame):
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
+        self.revert_img = PhotoImage(file="image\\revert.gif")
+        revert_btn = Button(self, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
+        revert_btn.pack(side=TOP, pady=6)
+        self.create_tooltip(revert_btn, "revert")
+
         label1 = Label(self, text="Outline Color")
         label1.pack(side=TOP, pady=(6, 0))
 
@@ -78,8 +83,8 @@ class ControlFrame(Frame):
         self.transparency.pack(side=TOP)
 
         self.clear_img = PhotoImage(file="image\\cross.gif")
-        clear_btn = Button(self, image=self.clear_img, cursor="hand2", command=lambda: self.canvas.clear())
-        clear_btn.pack(side=BOTTOM)
+        clear_btn = Button(self, image=self.clear_img, cursor="hand2", command=self.canvas.clear)
+        clear_btn.pack(side=BOTTOM, pady=10)
         self.create_tooltip(clear_btn, "clear all")
 
         self.setting_frame = SettingFrame(self)
@@ -181,7 +186,7 @@ class SettingFrame(Frame):
             self.brush_width.set(settings["BRUSH_WIDTH"])
             self.brush_width.pack(side=TOP)
 
-            label2 = Label(self, text="Mode")
+            label2 = Label(self, text="Shape")
             label2.pack(side=TOP, pady=(6, 0))
 
             self.mode = StringVar()
@@ -210,7 +215,7 @@ class SettingFrame(Frame):
             self.eraser_width.set(settings["ERASER_WIDTH"])
             self.eraser_width.pack(side=TOP)
 
-            label2 = Label(self, text="Mode")
+            label2 = Label(self, text="Shape")
             label2.pack(side=TOP, pady=(6, 0))
 
             self.mode = StringVar()
