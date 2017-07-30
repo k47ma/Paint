@@ -1,5 +1,5 @@
-from Canvas import *
-from Controller import *
+from canvas import *
+from controller import *
 
 
 # top level class
@@ -9,8 +9,8 @@ class Paint(Tk):
 
         self.iconbitmap(r'image\paint.ico')
         self.wm_title("Paint")
-        self.geometry("800x600")
-        self.minsize(800, 600)
+        self.geometry("900x640+0+0")
+        self.minsize(900, 640)
 
         canvas_panel = PaintCanvas(self)
         control_frame = ControlFrame(self, canvas_panel)

@@ -1,5 +1,5 @@
 from tkinter import *
-from Tooltip import *
+from tooltip import *
 from config import *
 import tkColorChooser
 
@@ -189,13 +189,22 @@ class SettingFrame(Frame):
             label2 = Label(self, text="Shape")
             label2.pack(side=TOP, pady=(6, 0))
 
+            shape_frame = Frame(self)
+            shape_frame.pack(side=TOP)
+
+            shape_circle = Label(shape_frame, text=u"\u26ab", font=("times", 10), anchor=W)
+            shape_circle.grid(row=0, column=1)
+
+            shape_rect = Label(shape_frame, text=u"\u25a0", font=("times", 15), anchor=W)
+            shape_rect.grid(row=1, column=1)
+
             self.mode = StringVar()
             self.mode.set("circle")
 
-            mode1 = Radiobutton(self, text=u"\u26ab", variable=self.mode, value="circle", command=self.set_brush_mode)
-            mode2 = Radiobutton(self, text=u"\u25a0", variable=self.mode, value="square", command=self.set_brush_mode)
-            mode1.pack(side=TOP)
-            mode2.pack(side=TOP)
+            mode1 = Radiobutton(shape_frame, variable=self.mode, value="circle", command=self.set_brush_mode)
+            mode2 = Radiobutton(shape_frame, variable=self.mode, value="square", command=self.set_brush_mode)
+            mode1.grid(row=0, column=0)
+            mode2.grid(row=1, column=0)
 
         def set_brush_width(self, event):
             settings["BRUSH_WIDTH"] = self.brush_width.get()
@@ -218,13 +227,22 @@ class SettingFrame(Frame):
             label2 = Label(self, text="Shape")
             label2.pack(side=TOP, pady=(6, 0))
 
+            shape_frame = Frame(self)
+            shape_frame.pack(side=TOP)
+
+            shape_circle = Label(shape_frame, text=u"\u26ab", font=("times", 10), anchor=W)
+            shape_circle.grid(row=0, column=1)
+
+            shape_rect = Label(shape_frame, text=u"\u25a0", font=("times", 15), anchor=W)
+            shape_rect.grid(row=1, column=1)
+
             self.mode = StringVar()
             self.mode.set("circle")
 
-            mode1 = Radiobutton(self, text=u"\u26ab", variable=self.mode, value="circle", command=self.set_eraser_mode)
-            mode2 = Radiobutton(self, text=u"\u25a0", variable=self.mode, value="square", command=self.set_eraser_mode)
-            mode1.pack(side=TOP)
-            mode2.pack(side=TOP)
+            mode1 = Radiobutton(shape_frame, variable=self.mode, value="circle", command=self.set_eraser_mode)
+            mode2 = Radiobutton(shape_frame, variable=self.mode, value="square", command=self.set_eraser_mode)
+            mode1.grid(row=0, column=0)
+            mode2.grid(row=1, column=0)
 
         def set_eraser_width(self, event):
             settings["ERASER_WIDTH"] = self.eraser_width.get()
