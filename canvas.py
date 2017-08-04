@@ -49,7 +49,7 @@ class PaintCanvas(Canvas):
     def addBrushLine(self, event):
         r = settings["BRUSH_WIDTH"]
         if settings["BRUSH_MODE"] == "circle":
-            oval = self.create_oval((event.x - r, event.y - r, event.x + r, event.y + r), fill=settings["COLOR"],
+            oval = self.oval((event.x - r, event.y - r, event.x + r, event.y + r), fill=settings["COLOR"],
                                     outline=settings["COLOR"])
             self.action.append(oval)
         elif settings["BRUSH_MODE"] == "square":
