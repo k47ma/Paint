@@ -13,6 +13,7 @@ class PaintCanvas(Canvas):
         self.firstClick = True
         self.history = []
         self.action = []
+        self.entry = None
 
         self.bind("<Button-1>", self.startDraw)
         self.bind("<B1-Motion>", self.draw)
@@ -22,6 +23,8 @@ class PaintCanvas(Canvas):
         if self.firstClick:
             self.lastX, self.lastY = event.x, event.y
             self.firstClick = False
+        if self.type == "text" and self.entry:
+            self.entry.draw_text()
         self.draw(event)
 
     def draw(self, event):
@@ -38,6 +41,8 @@ class PaintCanvas(Canvas):
             self.addRect(event)
         elif type == "circle":
             self.addCircle(event)
+        elif type == "text":
+            self.addDashRect(event)
 
     def addPencilLine(self, event):
         line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
@@ -176,6 +181,33 @@ class PaintCanvas(Canvas):
                                              outline=settings["COLOR"], fill=fill_color)
         self.action = [oval]
 
+    def addDashRect(self, event):
+        if self.action:
+            self.delete(self.action[0])
+
+        if event.state == SHIFT:
+            side = min(abs(self.lastX - event.x), abs(self.lastY - event.y))
+
+            # determine the direction of endpoint
+            if event.x - self.lastX >= 0:
+                dir_x = 1
+            else:
+                dir_x = -1
+
+            if event.y - self.lastY >= 0:
+                dir_y = 1
+            else:
+                dir_y = -1
+
+            # draw square
+            end_x = self.lastX + dir_x * side
+            end_y = self.lastY + dir_y * side
+            rect = self.create_rectangle(self.lastX, self.lastY, end_x, end_y, outline="black", fill="white", dash=[3, 3])
+        else:
+            # draw rectangle
+            rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y, outline="black", fill="white", dash=[3, 3])
+        self.action = [rect]
+
     def revert(self, event=None):
         try:
             last_action = self.history.pop()
@@ -186,9 +218,44 @@ class PaintCanvas(Canvas):
             self.delete(action)
 
     def setDraw(self, event=None):
-        self.history.append(self.action)
+        if self.type == "text":
+            (x1, y1, x2, y2) = self.coords(self.action[0])
+
+            width = abs(x1 - x2)
+            height = abs(y1 - y2)
+
+            char_width = int(width // 7)
+            char_height = int(height // 15)
+
+            self.delete(self.action[0])
+
+            paint_text = self.PaintText(self, x1, y1, char_width, char_height)
+
+            paint_text.place(x=x1, y=y1, anchor=NW)
+        else:
+            self.history.append(self.action)
+
         self.firstClick = True
         self.action = []
 
     def clear(self):
         self.delete("all")
+
+    class PaintText(Text):
+        def __init__(self, parent, x, y, width, height):
+            Text.__init__(self, parent, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1)
+            self.parent = parent
+            self.x = x
+            self.y = y
+
+            self.focus()
+            self.bind("<FocusOut>", self.draw_text)
+            self.bind("<Key-Return>", self.draw_text)
+            self.bind("<Control-Return>", lambda x: self.insert(INSERT, ""))
+
+        def draw_text(self, *args):
+            text = self.get(1.0, END)
+            draw = self.parent.create_text(self.x+1, self.y-9, text=text, anchor=NW, font=("Arial", 10), width=210)
+            self.parent.history.append([draw])
+            self.parent.entry = None
+            self.destroy()

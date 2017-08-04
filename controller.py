@@ -55,6 +55,13 @@ class ControlFrame(Frame):
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
+        self.text_img = PhotoImage(file="image\\text.gif")
+        text_btn = Button(self, image=self.text_img, cursor="hand2", command=lambda: self.select("text"))
+        text_btn.pack(side=TOP)
+        self.create_tooltip(text_btn, "textfield")
+        self.types["text"] = text_btn
+        self.cursors["text"] = "xterm"
+
         self.revert_img = PhotoImage(file="image\\revert.gif")
         revert_btn = Button(self, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
         revert_btn.pack(side=TOP, pady=6)
@@ -63,18 +70,18 @@ class ControlFrame(Frame):
         label1 = Label(self, text="Outline Color")
         label1.pack(side=TOP, pady=(6, 0))
 
-        self.color_btn = Button(self, bg=settings["COLOR"], width=3, bd=1, relief=GROOVE,
+        self.color_btn = Button(self, bg=settings["COLOR"], width=3, bd=2, relief=GROOVE,
                                 activebackground=settings["COLOR"],
                                 command=self.select_color)
-        self.color_btn.pack(side=TOP)
+        self.color_btn.pack(side=TOP, ipadx=2, ipady=2)
 
         label2 = Label(self, text="Fill Color")
         label2.pack(side=TOP, pady=(6, 0))
 
-        self.fill_color_btn = Button(self, bg=settings["FILL_COLOR"], width=3, bd=1, relief=GROOVE,
+        self.fill_color_btn = Button(self, bg=settings["FILL_COLOR"], width=3, bd=2, relief=GROOVE,
                                      activebackground=settings["FILL_COLOR"],
                                      command=self.select_fill_color)
-        self.fill_color_btn.pack(side=TOP)
+        self.fill_color_btn.pack(side=TOP, ipadx=2, ipady=2)
 
         self.transparency_var = IntVar()
         self.transparency_var.set(1)
@@ -87,11 +94,18 @@ class ControlFrame(Frame):
         clear_btn.pack(side=BOTTOM, pady=10)
         self.create_tooltip(clear_btn, "clear all")
 
+        self.position = Label(self, text="(0, 0)", font=("Arial", 8))
+        self.position.pack(side=BOTTOM)
+        self.canvas.bind("<Motion>", self.printPosition)
+
         self.setting_frame = SettingFrame(self)
         self.setting_frame.pack(side=TOP, fill=BOTH, expand=True, ipady=6)
 
         self.select("pencil")
         self.setting_frame.show("pencil")
+
+    def printPosition(self, event):
+        self.position["text"] = "(%d, %d)" % (event.x, event.y)
 
     def select(self, name):
         # deselect all the buttons and select target button
@@ -155,6 +169,10 @@ class SettingFrame(Frame):
         circle_frame = self.CircleFrame(self)
         circle_frame.grid(row=0, column=0, sticky=NSEW)
         self.frames["circle"] = circle_frame
+
+        text_frame = self.TextFrame(self)
+        text_frame.grid(row=0, column=0, sticky=NSEW)
+        self.frames["text"] = text_frame
 
     def show(self, name):
         self.frames[name].lift()
@@ -294,3 +312,8 @@ class SettingFrame(Frame):
 
         def set_circle_width(self, event):
             settings["CIRCLE_WIDTH"] = self.circle_width.get()
+
+    class TextFrame(Frame):
+        def __init__(self, parent):
+            Frame.__init__(self, parent)
+
