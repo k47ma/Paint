@@ -18,5 +18,6 @@ class Paint(Tk):
         canvas_panel.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
 
 
-paint = Paint()
-paint.mainloop()
+if __name__ == '__main__':
+    paint = Paint()
+    paint.mainloop()
