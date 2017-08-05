@@ -10,6 +10,7 @@ class ControlFrame(Frame):
         Frame.__init__(self, parent)
 
         self.canvas = canvas
+        self.canvas.controller = self
         self.types = {}
         self.cursors = {}
 
@@ -60,7 +61,7 @@ class ControlFrame(Frame):
         text_btn.pack(side=TOP)
         self.create_tooltip(text_btn, "textfield")
         self.types["text"] = text_btn
-        self.cursors["text"] = "xterm"
+        self.cursors["text"] = "tcross"
 
         self.revert_img = PhotoImage(file="image\\revert.gif")
         revert_btn = Button(self, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
@@ -96,7 +97,6 @@ class ControlFrame(Frame):
 
         self.position = Label(self, text="(0, 0)", font=("Arial", 8))
         self.position.pack(side=BOTTOM)
-        self.canvas.bind("<Motion>", self.printPosition)
 
         self.setting_frame = SettingFrame(self)
         self.setting_frame.pack(side=TOP, fill=BOTH, expand=True, ipady=6)
@@ -104,7 +104,7 @@ class ControlFrame(Frame):
         self.select("pencil")
         self.setting_frame.show("pencil")
 
-    def printPosition(self, event):
+    def printMousePosition(self, event):
         self.position["text"] = "(%d, %d)" % (event.x, event.y)
 
     def select(self, name):

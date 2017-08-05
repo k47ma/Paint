@@ -14,10 +14,16 @@ class PaintCanvas(Canvas):
         self.history = []
         self.action = []
         self.entry = None
+        self.controller = None
 
         self.bind("<Button-1>", self.startDraw)
+        self.bind("<Motion>", self.printMousePosition)
         self.bind("<B1-Motion>", self.draw)
         self.bind("<ButtonRelease-1>", self.setDraw)
+
+    def printMousePosition(self, event):
+        if self.controller:
+            self.controller.printMousePosition(event)
 
     def startDraw(self, event):
         if self.firstClick:
@@ -28,6 +34,8 @@ class PaintCanvas(Canvas):
         self.draw(event)
 
     def draw(self, event):
+        self.printMousePosition(event)
+
         type = self.type
         if type == "pencil":
             self.addPencilLine(event)
@@ -81,8 +89,8 @@ class PaintCanvas(Canvas):
             # avoid "divided by 0" error
             if event.x == self.lastX:
                 line = self.create_line((self.lastX, self.lastY, self.lastX, event.y),
-                                                        fill=settings["COLOR"], width=settings["LINE_WIDTH"],
-                                                        capstyle=ROUND)
+                                        fill=settings["COLOR"], width=settings["LINE_WIDTH"],
+                                        capstyle=ROUND)
                 self.action = [line]
                 return
 
@@ -90,25 +98,25 @@ class PaintCanvas(Canvas):
 
             if slope >= tan(radians(67.5)) or slope < tan(radians(112.5)):
                 line = self.create_line((self.lastX, self.lastY, self.lastX, event.y),
-                                                        fill=settings["COLOR"], width=settings["LINE_WIDTH"],
-                                                        capstyle=ROUND)
+                                        fill=settings["COLOR"], width=settings["LINE_WIDTH"],
+                                        capstyle=ROUND)
             elif tan(radians(-22.5)) <= slope < tan(radians(22.5)):
                 line = self.create_line((self.lastX, self.lastY, event.x, self.lastY),
-                                                        fill=settings["COLOR"], width=settings["LINE_WIDTH"],
-                                                        capstyle=ROUND)
+                                        fill=settings["COLOR"], width=settings["LINE_WIDTH"],
+                                        capstyle=ROUND)
             elif tan(radians(22.5)) <= slope < tan(radians(67.5)):
                 end_x = int(round((self.lastX + event.x - self.lastY + event.y) / 2))
                 end_y = int(round((event.x - self.lastX + event.y + self.lastY) / 2))
                 line = self.create_line((self.lastX, self.lastY, end_x, end_y), fill=settings["COLOR"],
-                                                        width=settings["LINE_WIDTH"], capstyle=ROUND)
+                                        width=settings["LINE_WIDTH"], capstyle=ROUND)
             else:
                 end_x = int(round((self.lastX + event.x + self.lastY - event.y) / 2))
                 end_y = int(round((self.lastX - event.x + self.lastY + event.y) / 2))
                 line = self.create_line((self.lastX, self.lastY, end_x, end_y), fill=settings["COLOR"],
-                                                        width=settings["LINE_WIDTH"], capstyle=ROUND)
+                                        width=settings["LINE_WIDTH"], capstyle=ROUND)
         else:
             line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
-                                                    width=settings["LINE_WIDTH"], capstyle=ROUND)
+                                    width=settings["LINE_WIDTH"], capstyle=ROUND)
         self.action = [line]
 
     def addRect(self, event):
@@ -138,13 +146,13 @@ class PaintCanvas(Canvas):
             end_x = self.lastX + dir_x * side
             end_y = self.lastY + dir_y * side
             rect = self.create_rectangle(self.lastX, self.lastY, end_x, end_y, width=settings["RECT_WIDTH"],
-                                                  outline=settings["COLOR"],
-                                                  fill=fill_color)
+                                         outline=settings["COLOR"],
+                                         fill=fill_color)
         else:
             # draw rectangle
             rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y,
-                                                  width=settings["RECT_WIDTH"],
-                                                  outline=settings["COLOR"], fill=fill_color)
+                                         width=settings["RECT_WIDTH"],
+                                         outline=settings["COLOR"], fill=fill_color)
         self.action = [rect]
 
     def addCircle(self, event):
@@ -174,11 +182,11 @@ class PaintCanvas(Canvas):
             end_x = self.lastX + dir_x * diameter
             end_y = self.lastY + dir_y * diameter
             oval = self.create_oval((self.lastX, self.lastY, end_x, end_y), width=settings["CIRCLE_WIDTH"],
-                                             outline=settings["COLOR"],
-                                             fill=fill_color)
+                                    outline=settings["COLOR"],
+                                    fill=fill_color)
         else:
             oval = self.create_oval((self.lastX, self.lastY, event.x, event.y), width=settings["CIRCLE_WIDTH"],
-                                             outline=settings["COLOR"], fill=fill_color)
+                                    outline=settings["COLOR"], fill=fill_color)
         self.action = [oval]
 
     def addDashRect(self, event):
@@ -202,10 +210,12 @@ class PaintCanvas(Canvas):
             # draw square
             end_x = self.lastX + dir_x * side
             end_y = self.lastY + dir_y * side
-            rect = self.create_rectangle(self.lastX, self.lastY, end_x, end_y, outline="black", fill="white", dash=[3, 3])
+            rect = self.create_rectangle(self.lastX, self.lastY, end_x, end_y, outline="black", fill="white",
+                                         dash=[3, 3])
         else:
             # draw rectangle
-            rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y, outline="black", fill="white", dash=[3, 3])
+            rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y, outline="black", fill="white",
+                                         dash=[3, 3])
         self.action = [rect]
 
     def revert(self, event=None):
@@ -227,6 +237,9 @@ class PaintCanvas(Canvas):
             char_width = int(width // 7)
             char_height = int(height // 15)
 
+            if char_width < 10:
+                char_width = 10
+
             self.delete(self.action[0])
 
             paint_text = self.PaintText(self, x1, y1, char_width, char_height)
@@ -244,6 +257,7 @@ class PaintCanvas(Canvas):
     class PaintText(Text):
         def __init__(self, parent, x, y, width, height):
             Text.__init__(self, parent, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1)
+            self.width = width
             self.parent = parent
             self.x = x
             self.y = y
@@ -255,7 +269,8 @@ class PaintCanvas(Canvas):
 
         def draw_text(self, *args):
             text = self.get(1.0, END)
-            draw = self.parent.create_text(self.x+1, self.y-9, text=text, anchor=NW, font=("Arial", 10), width=210)
+            draw = self.parent.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=("Arial", 10),
+                                           width=self.width * 7)
             self.parent.history.append([draw])
             self.parent.entry = None
             self.destroy()

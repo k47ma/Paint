@@ -20,7 +20,8 @@ class App:
             image.put("#%02x%02x%02x" % (color, color, color), (row, col))
             col += 1
             if col == 100:
-                row += 1; col = 0
+                row += 1
+                col = 0
         return image
 
     def start(self, *args):
