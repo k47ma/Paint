@@ -256,7 +256,8 @@ class PaintCanvas(Canvas):
 
     class PaintText(Text):
         def __init__(self, parent, x, y, width, height):
-            Text.__init__(self, parent, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1)
+            Text.__init__(self, parent, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1,
+                          fg=settings["COLOR"])
             self.width = width
             self.parent = parent
             self.x = x
@@ -270,7 +271,7 @@ class PaintCanvas(Canvas):
         def draw_text(self, *args):
             text = self.get(1.0, END)
             draw = self.parent.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=("Arial", 10),
-                                           width=self.width * 7)
+                                           width=self.width * 7, fill=settings["COLOR"])
             self.parent.history.append([draw])
             self.parent.entry = None
             self.destroy()
