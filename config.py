@@ -15,5 +15,10 @@ settings = {
     "RECT_WIDTH": 1.0,
     "CIRCLE_WIDTH": 1.0,
     "FILL_COLOR": "#ffffff",
-    "TRANSPARENT": True
+    "TRANSPARENT": True,
+    "TEXT_COLOR": "#000000",
+    "BOLD": False,
+    "SLANT": False,
+    "UNDERLINE": False,
+    "OVERSTRIKE": False
 }

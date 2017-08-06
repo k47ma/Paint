@@ -255,13 +255,17 @@ class PaintCanvas(Canvas):
         self.delete("all")
 
     class PaintText(Text):
-        def __init__(self, parent, x, y, width, height):
-            Text.__init__(self, parent, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1,
-                          fg=settings["COLOR"])
+        def __init__(self, canvas, x, y, width, height):
+            Text.__init__(self, canvas, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1,
+                          fg=settings["TEXT_COLOR"])
             self.width = width
-            self.parent = parent
+            self.height = height
+            self.canvas = canvas
             self.x = x
             self.y = y
+
+            if not settings["TRANSPARENT"]:
+                self["bg"] = settings["FILL_COLOR"]
 
             self.focus()
             self.bind("<FocusOut>", self.draw_text)
@@ -269,9 +273,26 @@ class PaintCanvas(Canvas):
             self.bind("<Control-Return>", lambda x: self.insert(INSERT, ""))
 
         def draw_text(self, *args):
+            background = None
+
+            # draw the background of text
+            if not settings["TRANSPARENT"]:
+                x1 = self.x
+                y1 = self.y
+                x2 = x1 + self.width * 7
+                y2 = y1 + self.height * 15
+
+                background = self.canvas.create_rectangle((x1, y1, x2, y2), outline=settings["COLOR"],
+                                                          fill=settings["FILL_COLOR"])
+
             text = self.get(1.0, END)
-            draw = self.parent.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=("Arial", 10),
-                                           width=self.width * 7, fill=settings["COLOR"])
-            self.parent.history.append([draw])
-            self.parent.entry = None
+            draw = self.canvas.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=("Arial", 10),
+                                           width=self.width * 7, fill=settings["TEXT_COLOR"])
+
+            if not settings["TRANSPARENT"]:
+                self.canvas.history.append([draw, background])
+            else:
+                self.canvas.history.append([draw])
+
+            self.canvas.entry = None
             self.destroy()

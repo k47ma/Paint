@@ -1,3 +1,5 @@
+import tkFont
+import tkMessageBox
 from tkinter import *
 from tooltip import *
 from config import *
@@ -7,99 +9,132 @@ import tkColorChooser
 # frame for control buttons
 class ControlFrame(Frame):
     def __init__(self, parent, canvas):
-        Frame.__init__(self, parent)
+        Frame.__init__(self, parent, width=130)
 
+        self.pack_propagate(False)
         self.canvas = canvas
         self.canvas.controller = self
         self.types = {}
         self.cursors = {}
 
+        # tools setting
+        tools_frame = LabelFrame(self, text="Tools")
+        tools_frame.pack(side=TOP, fill=BOTH, pady=(6, 0), ipady=5)
+
+        tools_btn_frame = Frame(tools_frame)
+        tools_btn_frame.pack(side=TOP)
+
         self.pencil_img = PhotoImage(file="image\\pencil.gif")
-        pencil_btn = Button(self, image=self.pencil_img, cursor="hand2", command=lambda: self.select("pencil"))
-        pencil_btn.pack(side=TOP)
+        pencil_btn = Button(tools_btn_frame, image=self.pencil_img, cursor="hand2", command=lambda: self.select("pencil"))
+        pencil_btn.grid(row=0, column=0)
         self.create_tooltip(pencil_btn, "pencil")
         self.types["pencil"] = pencil_btn
         self.cursors["pencil"] = "@pencil.cur"
 
         self.brush_img = PhotoImage(file="image\\brush.gif")
-        brush_btn = Button(self, image=self.brush_img, cursor="hand2", command=lambda: self.select("brush"))
-        brush_btn.pack(side=TOP)
+        brush_btn = Button(tools_btn_frame, image=self.brush_img, cursor="hand2", command=lambda: self.select("brush"))
+        brush_btn.grid(row=1, column=0)
         self.create_tooltip(brush_btn, "brush")
         self.types["brush"] = brush_btn
         self.cursors["brush"] = "@brush.cur"
 
         self.eraser_img = PhotoImage(file="image\\eraser.gif")
-        eraser_btn = Button(self, image=self.eraser_img, cursor="hand2", command=lambda: self.select("eraser"))
-        eraser_btn.pack(side=TOP)
+        eraser_btn = Button(tools_btn_frame, image=self.eraser_img, cursor="hand2", command=lambda: self.select("eraser"))
+        eraser_btn.grid(row=2, column=0)
         self.create_tooltip(eraser_btn, "eraser")
         self.types["eraser"] = eraser_btn
         self.cursors["eraser"] = "@eraser.cur"
 
+        self.text_img = PhotoImage(file="image\\text.gif")
+        text_btn = Button(tools_btn_frame, image=self.text_img, cursor="hand2", command=lambda: self.select("text"))
+        text_btn.grid(row=3, column=0)
+        self.create_tooltip(text_btn, "textfield")
+        self.types["text"] = text_btn
+        self.cursors["text"] = "tcross"
+
         self.line_img = PhotoImage(file="image\\line.gif")
-        line_btn = Button(self, image=self.line_img, cursor="hand2", command=lambda: self.select("line"))
-        line_btn.pack(side=TOP)
+        line_btn = Button(tools_btn_frame, image=self.line_img, cursor="hand2", command=lambda: self.select("line"))
+        line_btn.grid(row=0, column=1)
         self.create_tooltip(line_btn, "line")
         self.types["line"] = line_btn
         self.cursors["line"] = "plus"
 
         self.rect_img = PhotoImage(file="image\\rect.gif")
-        rect_btn = Button(self, image=self.rect_img, cursor="hand2", command=lambda: self.select("rect"))
-        rect_btn.pack(side=TOP)
+        rect_btn = Button(tools_btn_frame, image=self.rect_img, cursor="hand2", command=lambda: self.select("rect"))
+        rect_btn.grid(row=1, column=1)
         self.create_tooltip(rect_btn, "rectangle")
         self.types["rect"] = rect_btn
         self.cursors["rect"] = "tcross"
 
         self.oval_img = PhotoImage(file="image\\oval.gif")
-        circle_btn = Button(self, image=self.oval_img, cursor="hand2", command=lambda: self.select("circle"))
-        circle_btn.pack(side=TOP)
+        circle_btn = Button(tools_btn_frame, image=self.oval_img, cursor="hand2", command=lambda: self.select("circle"))
+        circle_btn.grid(row=2, column=1)
         self.create_tooltip(circle_btn, "oval")
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
-        self.text_img = PhotoImage(file="image\\text.gif")
-        text_btn = Button(self, image=self.text_img, cursor="hand2", command=lambda: self.select("text"))
-        text_btn.pack(side=TOP)
-        self.create_tooltip(text_btn, "textfield")
-        self.types["text"] = text_btn
-        self.cursors["text"] = "tcross"
-
         self.revert_img = PhotoImage(file="image\\revert.gif")
-        revert_btn = Button(self, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
-        revert_btn.pack(side=TOP, pady=6)
+        revert_btn = Button(tools_btn_frame, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
+        revert_btn.grid(row=4, column=0, pady=3)
         self.create_tooltip(revert_btn, "revert")
 
-        label1 = Label(self, text="Outline Color")
-        label1.pack(side=TOP, pady=(6, 0))
+        # colors setting
+        color_frame = LabelFrame(self, text="Colors")
+        color_frame.pack(side=TOP, fill=BOTH, pady=(6, 0), ipady=5)
+        color_frame.columnconfigure(0, weight=1)
+        color_frame.columnconfigure(1, weight=2)
+        color_frame.columnconfigure(2, weight=2)
 
-        self.color_btn = Button(self, bg=settings["COLOR"], width=3, bd=2, relief=GROOVE,
-                                activebackground=settings["COLOR"],
-                                command=self.select_color)
-        self.color_btn.pack(side=TOP, ipadx=2, ipady=2)
+        color_label = Label(color_frame, text="Outline", anchor=CENTER)
+        color_label.grid(row=0, column=0)
 
-        label2 = Label(self, text="Fill Color")
-        label2.pack(side=TOP, pady=(6, 0))
+        color_btn_frame = Frame(color_frame, width=25, height=25)
+        color_btn_frame.pack_propagate(False)
+        color_btn_frame.grid(row=1, column=0)
 
-        self.fill_color_btn = Button(self, bg=settings["FILL_COLOR"], width=3, bd=2, relief=GROOVE,
-                                     activebackground=settings["FILL_COLOR"],
-                                     command=self.select_fill_color)
-        self.fill_color_btn.pack(side=TOP, ipadx=2, ipady=2)
+        self.color_btn = Button(color_btn_frame, bg=settings["COLOR"], bd=2, relief=GROOVE,
+                                activebackground=settings["COLOR"], command=self.select_color)
+        self.color_btn.pack(side=TOP, fill=BOTH, expand=True)
+
+        fill_color_label = Label(color_frame, text="Fill", anchor=CENTER)
+        fill_color_label.grid(row=0, column=1)
+
+        fill_color_btn_frame = Frame(color_frame, width=25, height=25)
+        fill_color_btn_frame.pack_propagate(False)
+        fill_color_btn_frame.grid(row=1, column=1)
+
+        self.fill_color_btn = Button(fill_color_btn_frame, bg=settings["FILL_COLOR"], bd=2, relief=GROOVE,
+                                     activebackground=settings["FILL_COLOR"], command=self.select_fill_color)
+        self.fill_color_btn.pack(side=TOP, fill=BOTH, expand=True)
+
+        font_color_lbl = Label(color_frame, text="Text")
+        font_color_lbl.grid(row=0, column=2)
+
+        font_color_frame = Frame(color_frame, width=25, height=25)
+        font_color_frame.pack_propagate(False)
+        font_color_frame.grid(row=1, column=2)
+
+        self.color_btn = Button(font_color_frame, bg=settings["TEXT_COLOR"], bd=2, relief=GROOVE,
+                                activebackground=settings["TEXT_COLOR"], command=self.select_text_color)
+        self.color_btn.pack(side=TOP, fill=BOTH, expand=True)
 
         self.transparency_var = IntVar()
         self.transparency_var.set(1)
-        self.transparency = Checkbutton(self, text="Transparent Fill", variable=self.transparency_var,
+        self.transparency = Checkbutton(color_frame, text="Transparent Fill", variable=self.transparency_var,
                                         command=self.set_transparency)
-        self.transparency.pack(side=TOP)
+        self.transparency.grid(row=2, column=0, columnspan=3, pady=(5, 0))
 
         self.clear_img = PhotoImage(file="image\\cross.gif")
-        clear_btn = Button(self, image=self.clear_img, cursor="hand2", command=self.canvas.clear)
+        clear_btn = Button(self, image=self.clear_img, cursor="hand2", command=self.ask_clear)
         clear_btn.pack(side=BOTTOM, pady=10)
         self.create_tooltip(clear_btn, "clear all")
 
         self.position = Label(self, text="(0, 0)", font=("Arial", 8))
         self.position.pack(side=BOTTOM)
 
+        # settings for specific tool
         self.setting_frame = SettingFrame(self)
-        self.setting_frame.pack(side=TOP, fill=BOTH, expand=True, ipady=6)
+        self.setting_frame.pack(side=TOP, fill=BOTH, expand=True, ipady=6, pady=6)
 
         self.select("pencil")
         self.setting_frame.show("pencil")
@@ -129,17 +164,29 @@ class ControlFrame(Frame):
             settings["FILL_COLOR"] = selected_color[1]
             self.fill_color_btn["bg"] = settings["FILL_COLOR"]
 
+    def select_text_color(self):
+        selected_color = tkColorChooser.askcolor(settings["TEXT_COLOR"], parent=self.parent,
+                                                 title="Select Outline Color")
+        if selected_color[1]:
+            settings["TEXT_COLOR"] = selected_color[1]
+            self.color_btn["bg"] = settings["TEXT_COLOR"]
+
     def set_transparency(self):
         settings["TRANSPARENT"] = bool(self.transparency_var.get())
 
     def create_tooltip(self, widget, text):
         Tooltip(widget, text)
 
+    def ask_clear(self):
+        clear = tkMessageBox.askyesno("Clear Canvas", "Are you sure you want to clear the canvas?", default="no")
+        if clear:
+            self.canvas.clear()
+
 
 # frame for containing tool settings
-class SettingFrame(Frame):
+class SettingFrame(LabelFrame):
     def __init__(self, parent):
-        Frame.__init__(self, parent)
+        LabelFrame.__init__(self, parent, text="Settings")
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -316,4 +363,47 @@ class SettingFrame(Frame):
     class TextFrame(Frame):
         def __init__(self, parent):
             Frame.__init__(self, parent)
+            self.parent = parent
 
+            # font family setting
+            font_family_frame = Frame(self)
+            font_family_frame.pack(side=TOP, pady=(3, 0), padx=5)
+
+            font_families = sorted(tkFont.families())
+
+            font_family_label = Label(font_family_frame, text="Font Family")
+            font_family_label.pack(side=TOP)
+
+            font_family = Listbox(font_family_frame, height=1)
+            font_family.pack(side=TOP)
+
+            for font in font_families:
+                font_family.insert(END, font)
+
+            # font size setting
+            font_size_frame = Frame(self)
+            font_size_frame.pack(side=TOP, pady=(6, 0), padx=5)
+
+            font_size_label = Label(font_size_frame, text="Font Size")
+            font_size_label.pack(side=TOP)
+
+            font_size_var = IntVar()
+            font_size_var.set(10)
+            font_size = Spinbox(font_size_frame, textvariable=font_size_var, from_=0, to=100)
+            font_size.pack(side=TOP)
+
+            # font decoration setting
+            decoration_frame = Frame(self)
+            decoration_frame.pack(side=TOP, pady=(6, 0))
+
+            weight_btn = Button(decoration_frame, text="T", font=("times", 10, "bold"))
+            weight_btn.grid(row=0, column=0)
+
+            slant_btn = Button(decoration_frame, text="T", font=("times", 10, "italic"))
+            slant_btn.grid(row=0, column=1)
+
+            underline_btn = Button(decoration_frame, text="T", font=("times", 10, "underline"))
+            underline_btn.grid(row=0, column=2)
+
+            overstrike_btn = Button(decoration_frame, text="T", font=("times", 10, "overstrike"))
+            overstrike_btn.grid(row=0, column=3)
