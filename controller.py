@@ -3,6 +3,7 @@ import tkMessageBox
 from tkinter import *
 from tooltip import *
 from config import *
+from ttk import Combobox
 import tkColorChooser
 
 
@@ -25,7 +26,8 @@ class ControlFrame(Frame):
         tools_btn_frame.pack(side=TOP)
 
         self.pencil_img = PhotoImage(file="image\\pencil.gif")
-        pencil_btn = Button(tools_btn_frame, image=self.pencil_img, cursor="hand2", command=lambda: self.select("pencil"))
+        pencil_btn = Button(tools_btn_frame, image=self.pencil_img, cursor="hand2",
+                            command=lambda: self.select("pencil"))
         pencil_btn.grid(row=0, column=0)
         self.create_tooltip(pencil_btn, "pencil")
         self.types["pencil"] = pencil_btn
@@ -39,7 +41,8 @@ class ControlFrame(Frame):
         self.cursors["brush"] = "@brush.cur"
 
         self.eraser_img = PhotoImage(file="image\\eraser.gif")
-        eraser_btn = Button(tools_btn_frame, image=self.eraser_img, cursor="hand2", command=lambda: self.select("eraser"))
+        eraser_btn = Button(tools_btn_frame, image=self.eraser_img, cursor="hand2",
+                            command=lambda: self.select("eraser"))
         eraser_btn.grid(row=2, column=0)
         self.create_tooltip(eraser_btn, "eraser")
         self.types["eraser"] = eraser_btn
@@ -369,16 +372,20 @@ class SettingFrame(LabelFrame):
             font_family_frame = Frame(self)
             font_family_frame.pack(side=TOP, pady=(3, 0), padx=5)
 
-            font_families = sorted(tkFont.families())
+            self.font_families = sorted(tkFont.families())
 
             font_family_label = Label(font_family_frame, text="Font Family")
             font_family_label.pack(side=TOP)
 
-            font_family = Listbox(font_family_frame, height=1)
-            font_family.pack(side=TOP)
+            validate_command = self.register(self.validate_font)
 
-            for font in font_families:
-                font_family.insert(END, font)
+            self.font_family = Combobox(font_family_frame, height=10, values=self.font_families, validate='key',
+                                        validatecommand=validate_command)
+            self.font_family.set("Times New Roman")
+            self.font_family.pack(side=TOP)
+            self.font_family.bind("<<ComboboxSelected>>", self.set_font_family)
+            self.font_family.bind("<FocusOut>", self.set_font_family)
+            self.font_family.bind("<Key-Return>", lambda x: self.focus_force())
 
             # font size setting
             font_size_frame = Frame(self)
@@ -389,21 +396,77 @@ class SettingFrame(LabelFrame):
 
             font_size_var = IntVar()
             font_size_var.set(10)
-            font_size = Spinbox(font_size_frame, textvariable=font_size_var, from_=0, to=100)
-            font_size.pack(side=TOP)
+            self.font_size = Spinbox(font_size_frame, textvariable=font_size_var, font=("arial", 10), from_=0, to=100,
+                                     command=self.set_font_size)
+            self.font_size.pack(side=TOP)
+            self.font_size.bind("<FocusOut>", self.set_font_size)
+            self.font_size.bind("<Key-Return>", lambda x: self.focus_force())
 
             # font decoration setting
             decoration_frame = Frame(self)
             decoration_frame.pack(side=TOP, pady=(6, 0))
 
-            weight_btn = Button(decoration_frame, text="T", font=("times", 10, "bold"))
-            weight_btn.grid(row=0, column=0)
+            self.weight_btn = Button(decoration_frame, text="T", font=("times", 10, "bold"),
+                                     command=lambda: self.set_decoration("weight"))
+            self.weight_btn.grid(row=0, column=0)
 
-            slant_btn = Button(decoration_frame, text="T", font=("times", 10, "italic"))
-            slant_btn.grid(row=0, column=1)
+            self.slant_btn = Button(decoration_frame, text="T", font=("times", 10, "italic"),
+                                    command=lambda: self.set_decoration("slant"))
+            self.slant_btn.grid(row=0, column=1)
 
-            underline_btn = Button(decoration_frame, text="T", font=("times", 10, "underline"))
-            underline_btn.grid(row=0, column=2)
+            self.underline_btn = Button(decoration_frame, text="T", font=("times", 10, "underline"),
+                                        command=lambda: self.set_decoration("underline"))
+            self.underline_btn.grid(row=0, column=2)
 
-            overstrike_btn = Button(decoration_frame, text="T", font=("times", 10, "overstrike"))
-            overstrike_btn.grid(row=0, column=3)
+            self.overstrike_btn = Button(decoration_frame, text="T", font=("times", 10, "overstrike"),
+                                         command=lambda: self.set_decoration("overstrike"))
+            self.overstrike_btn.grid(row=0, column=3)
+
+        def set_font_family(self, event):
+            settings["FONT_FAMILY"] = self.font_family.get()
+
+        def validate_font(self):
+            font_name = self.font_family.get()
+
+            for font in self.font_families:
+                if font.lower().startswith(font_name.lower()):
+                    return True
+            return False
+
+        def set_font_size(self, event=None):
+            try:
+                font_size = int(self.font_size.get())
+            except ValueError:
+                return
+            if 0 < font_size < 100:
+                settings["FONT_SIZE"] = font_size
+
+        def set_decoration(self, decoration_type):
+            if decoration_type == "weight":
+                if settings["BOLD"]:
+                    settings["BOLD"] = False
+                    self.weight_btn["relief"] = RAISED
+                else:
+                    settings["BOLD"] = True
+                    self.weight_btn["relief"] = SUNKEN
+            elif decoration_type == "slant":
+                if settings["SLANT"]:
+                    settings["SLANT"] = False
+                    self.slant_btn["relief"] = RAISED
+                else:
+                    settings["SLANT"] = True
+                    self.slant_btn["relief"] = SUNKEN
+            elif decoration_type == "underline":
+                if settings["UNDERLINE"]:
+                    settings["UNDERLINE"] = False
+                    self.underline_btn["relief"] = RAISED
+                else:
+                    settings["UNDERLINE"] = True
+                    self.underline_btn["relief"] = SUNKEN
+            elif decoration_type == "overstrike":
+                if settings["OVERSTRIKE"]:
+                    settings["OVERSTRIKE"] = False
+                    self.overstrike_btn["relief"] = RAISED
+                else:
+                    settings["OVERSTRIKE"] = True
+                    self.overstrike_btn["relief"] = SUNKEN

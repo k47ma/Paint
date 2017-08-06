@@ -26,6 +26,7 @@ class PaintCanvas(Canvas):
             self.controller.printMousePosition(event)
 
     def startDraw(self, event):
+        self.focus_force()
         if self.firstClick:
             self.lastX, self.lastY = event.x, event.y
             self.firstClick = False
@@ -243,7 +244,6 @@ class PaintCanvas(Canvas):
             self.delete(self.action[0])
 
             paint_text = self.PaintText(self, x1, y1, char_width, char_height)
-
             paint_text.place(x=x1, y=y1, anchor=NW)
         else:
             self.history.append(self.action)
@@ -256,13 +256,14 @@ class PaintCanvas(Canvas):
 
     class PaintText(Text):
         def __init__(self, canvas, x, y, width, height):
-            Text.__init__(self, canvas, relief=SOLID, font=("Arial", 10), width=width, height=height, wrap=WORD, bd=1,
+            Text.__init__(self, canvas, relief=SOLID, width=width, height=height, wrap=WORD, bd=1,
                           fg=settings["TEXT_COLOR"])
             self.width = width
             self.height = height
             self.canvas = canvas
             self.x = x
             self.y = y
+            self["font"] = self.get_font()
 
             if not settings["TRANSPARENT"]:
                 self["bg"] = settings["FILL_COLOR"]
@@ -286,7 +287,7 @@ class PaintCanvas(Canvas):
                                                           fill=settings["FILL_COLOR"])
 
             text = self.get(1.0, END)
-            draw = self.canvas.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=("Arial", 10),
+            draw = self.canvas.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=self.get_font(),
                                            width=self.width * 7, fill=settings["TEXT_COLOR"])
 
             if not settings["TRANSPARENT"]:
@@ -296,3 +297,21 @@ class PaintCanvas(Canvas):
 
             self.canvas.entry = None
             self.destroy()
+
+        def get_font(self):
+            font_family = settings["FONT_FAMILY"]
+            font_size = settings["FONT_SIZE"]
+            font_decoration_list = []
+
+            if settings["BOLD"]:
+                font_decoration_list.append("bold")
+            if settings["SLANT"]:
+                font_decoration_list.append("italic")
+            if settings["UNDERLINE"]:
+                font_decoration_list.append("underline")
+            if settings["OVERSTRIKE"]:
+                font_decoration_list.append("overstrike")
+
+            font_decoration = " ".join(font_decoration_list)
+
+            return (font_family, font_size, font_decoration)

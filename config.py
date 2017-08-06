@@ -17,6 +17,8 @@ settings = {
     "FILL_COLOR": "#ffffff",
     "TRANSPARENT": True,
     "TEXT_COLOR": "#000000",
+    "FONT_FAMILY": "Times New Roman",
+    "FONT_SIZE": 10,
     "BOLD": False,
     "SLANT": False,
     "UNDERLINE": False,
