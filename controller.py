@@ -12,11 +12,12 @@ class ControlFrame(Frame):
     def __init__(self, parent, canvas):
         Frame.__init__(self, parent, width=130)
 
-        self.pack_propagate(False)
+        self.parent = parent
         self.canvas = canvas
         self.canvas.controller = self
         self.types = {}
         self.cursors = {}
+        self.pack_propagate(False)
 
         # tools setting
         tools_frame = LabelFrame(self, text="Tools")
@@ -29,14 +30,14 @@ class ControlFrame(Frame):
         pencil_btn = Button(tools_btn_frame, image=self.pencil_img, cursor="hand2",
                             command=lambda: self.select("pencil"))
         pencil_btn.grid(row=0, column=0)
-        self.create_tooltip(pencil_btn, "pencil")
+        self.create_tooltip(pencil_btn, "pencil", "left")
         self.types["pencil"] = pencil_btn
         self.cursors["pencil"] = "@pencil.cur"
 
         self.brush_img = PhotoImage(file="image\\brush.gif")
         brush_btn = Button(tools_btn_frame, image=self.brush_img, cursor="hand2", command=lambda: self.select("brush"))
         brush_btn.grid(row=1, column=0)
-        self.create_tooltip(brush_btn, "brush")
+        self.create_tooltip(brush_btn, "brush", "left")
         self.types["brush"] = brush_btn
         self.cursors["brush"] = "@brush.cur"
 
@@ -44,14 +45,14 @@ class ControlFrame(Frame):
         eraser_btn = Button(tools_btn_frame, image=self.eraser_img, cursor="hand2",
                             command=lambda: self.select("eraser"))
         eraser_btn.grid(row=2, column=0)
-        self.create_tooltip(eraser_btn, "eraser")
+        self.create_tooltip(eraser_btn, "eraser", "left")
         self.types["eraser"] = eraser_btn
         self.cursors["eraser"] = "@eraser.cur"
 
         self.text_img = PhotoImage(file="image\\text.gif")
         text_btn = Button(tools_btn_frame, image=self.text_img, cursor="hand2", command=lambda: self.select("text"))
         text_btn.grid(row=3, column=0)
-        self.create_tooltip(text_btn, "textfield")
+        self.create_tooltip(text_btn, "textfield", "left")
         self.types["text"] = text_btn
         self.cursors["text"] = "tcross"
 
@@ -177,8 +178,8 @@ class ControlFrame(Frame):
     def set_transparency(self):
         settings["TRANSPARENT"] = bool(self.transparency_var.get())
 
-    def create_tooltip(self, widget, text):
-        Tooltip(widget, text)
+    def create_tooltip(self, widget, text, direction="right"):
+        Tooltip(widget, text, direction)
 
     def ask_clear(self):
         clear = tkMessageBox.askyesno("Clear Canvas", "Are you sure you want to clear the canvas?", default="no")
