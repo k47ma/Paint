@@ -230,7 +230,10 @@ class PaintCanvas(Canvas):
 
     def setDraw(self, event=None):
         if self.type == "text":
-            (x1, y1, x2, y2) = self.coords(self.action[0])
+            try:
+                (x1, y1, x2, y2) = self.coords(self.action[0])
+            except IndexError:
+                return
 
             width = abs(x1 - x2)
             height = abs(y1 - y2)

@@ -377,15 +377,12 @@ class SettingFrame(LabelFrame):
             font_family_label = Label(font_family_frame, text="Font Family")
             font_family_label.pack(side=TOP)
 
-            validate_command = self.register(self.validate_font)
-
-            self.font_family = Combobox(font_family_frame, height=10, values=self.font_families, validate='key',
-                                        validatecommand=validate_command)
+            self.font_family = Combobox(font_family_frame, height=10, values=self.font_families, state="readonly")
             self.font_family.set("Times New Roman")
             self.font_family.pack(side=TOP)
             self.font_family.bind("<<ComboboxSelected>>", self.set_font_family)
             self.font_family.bind("<FocusOut>", self.set_font_family)
-            self.font_family.bind("<Key-Return>", lambda x: self.focus_force())
+            self.font_family.bind("<Key>", self.validate_font)
 
             # font size setting
             font_size_frame = Frame(self)
@@ -394,17 +391,16 @@ class SettingFrame(LabelFrame):
             font_size_label = Label(font_size_frame, text="Font Size")
             font_size_label.pack(side=TOP)
 
-            font_size_var = IntVar()
-            font_size_var.set(10)
-            self.font_size = Spinbox(font_size_frame, textvariable=font_size_var, font=("arial", 10), from_=0, to=100,
-                                     command=self.set_font_size)
+            self.font_size_var = IntVar()
+            self.font_size_var.set(10)
+            self.font_size = Spinbox(font_size_frame, textvariable=self.font_size_var, font=("arial", 10), from_=0,
+                                     to=100, command=self.set_font_size)
             self.font_size.pack(side=TOP)
             self.font_size.bind("<FocusOut>", self.set_font_size)
-            self.font_size.bind("<Key-Return>", lambda x: self.focus_force())
 
             # font decoration setting
             decoration_frame = Frame(self)
-            decoration_frame.pack(side=TOP, pady=(6, 0))
+            decoration_frame.pack(side=TOP, pady=(10, 0))
 
             self.weight_btn = Button(decoration_frame, text="T", font=("times", 10, "bold"),
                                      command=lambda: self.set_decoration("weight"))
@@ -425,13 +421,14 @@ class SettingFrame(LabelFrame):
         def set_font_family(self, event):
             settings["FONT_FAMILY"] = self.font_family.get()
 
-        def validate_font(self):
-            font_name = self.font_family.get()
-
-            for font in self.font_families:
-                if font.lower().startswith(font_name.lower()):
-                    return True
-            return False
+        def validate_font(self, event):
+            if event.char:
+                ind = 0
+                for font in self.font_families:
+                    if font.lower().startswith(event.char):
+                        self.font_family.current(ind)
+                    else:
+                        ind += 1
 
         def set_font_size(self, event=None):
             try:
