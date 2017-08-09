@@ -22,5 +22,6 @@ settings = {
     "BOLD": False,
     "SLANT": False,
     "UNDERLINE": False,
-    "OVERSTRIKE": False
+    "OVERSTRIKE": False,
+    "SPRAY_SIZE": 1
 }

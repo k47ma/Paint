@@ -1,8 +1,6 @@
 from tkinter import *
 from config import *
 from math import *
-from PIL import ImageTk
-import random
 
 
 # frame for canvas
@@ -225,7 +223,8 @@ class PaintCanvas(Canvas):
 
     def addSpray(self, event):
         image = PhotoImage(file="image\\shaped_spray.gif")
-        self.bitmaps.append(image)
+        zoomed_image = image.zoom(settings["SPRAY_SIZE"])
+        self.bitmaps.append(zoomed_image)
         bmp = self.create_image((event.x, event.y), image=self.bitmaps[-1])
         self.action.append(bmp)
 

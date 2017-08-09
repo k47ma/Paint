@@ -499,3 +499,14 @@ class SettingFrame(LabelFrame):
     class SprayFrame(Frame):
         def __init__(self, parent):
             Frame.__init__(self, parent)
+
+            label = Label(self, text="Size")
+            label.pack(side=TOP, pady=(6, 0))
+
+            self.spray_size = Scale(self, from_=10, to=1, resolution=1, sliderlength=25,
+                                    command=self.set_spray_size)
+            self.spray_size.set(settings["SPRAY_SIZE"])
+            self.spray_size.pack(side=TOP)
+
+        def set_spray_size(self, event):
+            settings["SPRAY_SIZE"] = self.spray_size.get()
