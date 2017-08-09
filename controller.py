@@ -1,9 +1,11 @@
 import tkFont
 import tkMessageBox
+import tkFileDialog
 from tkinter import *
 from tooltip import *
 from config import *
 from ttk import Combobox
+from PIL import ImageGrab
 import tkColorChooser
 
 
@@ -81,6 +83,11 @@ class ControlFrame(Frame):
         revert_btn = Button(tools_btn_frame, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
         revert_btn.grid(row=4, column=0, pady=3)
         self.create_tooltip(revert_btn, "revert")
+
+        self.save_icon = PhotoImage(file="image\\save.gif")
+        save_btn = Button(tools_btn_frame, image=self.save_icon, cursor="hand2", command=self.save)
+        save_btn.grid(row=4, column=1, pady=3)
+        self.create_tooltip(save_btn, "save")
 
         # colors setting
         color_frame = LabelFrame(self, text="Colors")
@@ -185,6 +192,15 @@ class ControlFrame(Frame):
         clear = tkMessageBox.askyesno("Clear Canvas", "Are you sure you want to clear the canvas?", default="no")
         if clear:
             self.canvas.clear()
+
+    def save(self):
+        directory = tkFileDialog.asksaveasfilename(filetypes=[("JPG", "*.jpg"), ("Bitmap", "*.bmp"), ("PNG", "*.png"), ("GIF", "*.gif")])
+        if directory:
+            x1 = self.parent.winfo_rootx() + self.canvas.winfo_x()
+            y1 = self.parent.winfo_rooty() + self.canvas.winfo_y()
+            x2 = x1 + self.canvas.winfo_width()
+            y2 = y1 + self.canvas.winfo_height()
+            ImageGrab.grab().crop((x1, y1, x2, y2)).save(directory)
 
 
 # frame for containing tool settings

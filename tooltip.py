@@ -14,7 +14,7 @@ class Tooltip(object):
         if self.direction == "right":
             x, y, cx, cy = self.widget.bbox()
             x += self.widget.winfo_rootx() + self.widget.winfo_width()
-            y += self.widget.winfo_rooty()
+            y += self.widget.winfo_rooty() + int((self.widget.winfo_height() - 20) / 2)
         else:
             length = len(self.text)
             x, y, cx, cy = self.widget.bbox()
@@ -23,7 +23,7 @@ class Tooltip(object):
 
         # if the tooltip cannot be displayed (partly outside screen),
         #   then temporarily change the direction to be left
-        if x < 0:
+        if x < 0 and self.direction == "left":
             self.direction = "right"
             self.enter(event)
             self.direction = "left"
