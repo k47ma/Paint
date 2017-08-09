@@ -1,6 +1,8 @@
 from tkinter import *
 from config import *
 from math import *
+from PIL import ImageTk
+import random
 
 
 # frame for canvas
@@ -15,6 +17,7 @@ class PaintCanvas(Canvas):
         self.action = []
         self.entry = None
         self.controller = None
+        self.bitmaps = []
 
         self.bind("<Button-1>", self.startDraw)
         self.bind("<Motion>", self.printMousePosition)
@@ -26,7 +29,6 @@ class PaintCanvas(Canvas):
             self.controller.printMousePosition(event)
 
     def startDraw(self, event):
-        self.focus_force()
         if self.firstClick:
             self.lastX, self.lastY = event.x, event.y
             self.firstClick = False
@@ -52,6 +54,8 @@ class PaintCanvas(Canvas):
             self.addCircle(event)
         elif type == "text":
             self.addDashRect(event)
+        elif type == "spray":
+            self.addSpray(event)
 
     def addPencilLine(self, event):
         line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
@@ -218,6 +222,12 @@ class PaintCanvas(Canvas):
             rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y, outline="black", fill="white",
                                          dash=[3, 3])
         self.action = [rect]
+
+    def addSpray(self, event):
+        image = PhotoImage(file="image\\shaped_spray.gif")
+        self.bitmaps.append(image)
+        bmp = self.create_image((event.x, event.y), image=self.bitmaps[-1])
+        self.action.append(bmp)
 
     def revert(self, event=None):
         try:

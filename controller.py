@@ -79,14 +79,21 @@ class ControlFrame(Frame):
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
+        self.spray_img = PhotoImage(file="image\\spray.gif")
+        spray_btn = Button(tools_btn_frame, image=self.spray_img, cursor="hand2", command=lambda: self.select("spray"))
+        spray_btn.grid(row=3, column=1)
+        self.create_tooltip(spray_btn, "spray")
+        self.types["spray"] = spray_btn
+        self.cursors["spray"] = "@spray.cur"
+
         self.revert_img = PhotoImage(file="image\\revert.gif")
         revert_btn = Button(tools_btn_frame, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
-        revert_btn.grid(row=4, column=0, pady=3)
+        revert_btn.grid(row=4, column=0, pady=(6, 0))
         self.create_tooltip(revert_btn, "revert")
 
-        self.save_icon = PhotoImage(file="image\\save.gif")
-        save_btn = Button(tools_btn_frame, image=self.save_icon, cursor="hand2", command=self.save)
-        save_btn.grid(row=4, column=1, pady=3)
+        self.save_img = PhotoImage(file="image\\save.gif")
+        save_btn = Button(tools_btn_frame, image=self.save_img, cursor="hand2", command=self.save)
+        save_btn.grid(row=4, column=1, pady=(6, 0))
         self.create_tooltip(save_btn, "save")
 
         # colors setting
@@ -240,6 +247,10 @@ class SettingFrame(LabelFrame):
         text_frame = self.TextFrame(self)
         text_frame.grid(row=0, column=0, sticky=NSEW)
         self.frames["text"] = text_frame
+
+        spray_frame = self.SprayFrame(self)
+        spray_frame.grid(row=0, column=0, sticky=NSEW)
+        self.frames["spray"] = spray_frame
 
     def show(self, name):
         self.frames[name].lift()
@@ -484,3 +495,7 @@ class SettingFrame(LabelFrame):
                 else:
                     settings["OVERSTRIKE"] = True
                     self.overstrike_btn["relief"] = SUNKEN
+
+    class SprayFrame(Frame):
+        def __init__(self, parent):
+            Frame.__init__(self, parent)

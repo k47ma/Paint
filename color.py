@@ -1,5 +1,7 @@
-import Tkinter, random
-import time, threading
+import Tkinter
+import random
+import threading
+
 
 class App:
     def __init__(self, t):
@@ -13,11 +15,11 @@ class App:
 
     def generate_image(self):
         image = Tkinter.PhotoImage(width=100, height=100)
-        colors = [random.randint(0, 255) for j in range(0, 10000)]
-        row=0
+        colors = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for j in range(0, 10000)]
+        row = 0
         col = 0
         for color in colors:
-            image.put("#%02x%02x%02x" % (color, color, color), (row, col))
+            image.put("#%02x%02x%02x" % color, (row, col))
             col += 1
             if col == 100:
                 row += 1
