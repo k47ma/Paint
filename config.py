@@ -5,6 +5,8 @@ CTRL = 268
 
 # variables for configuration settings
 settings = {
+    "CANVAS": None,
+    "CONTROLLER": None,
     "COLOR": "#000000",
     "PENCIL_WIDTH": 1.0,
     "BRUSH_WIDTH": 7.5,
@@ -23,5 +25,7 @@ settings = {
     "SLANT": False,
     "UNDERLINE": False,
     "OVERSTRIKE": False,
-    "SPRAY_SIZE": 1
+    "SPRAY_SIZE": 1,
+    "HOST": "",
+    "PORT": 0
 }

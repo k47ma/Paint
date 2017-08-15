@@ -4,6 +4,8 @@ import tkFileDialog
 from tkinter import *
 from tooltip import *
 from config import *
+from my_server import ServerSettingWindow
+from my_client import ClientSettingWindow
 from ttk import Combobox
 from PIL import ImageGrab
 import tkColorChooser
@@ -20,10 +22,16 @@ class ControlFrame(Frame):
         self.types = {}
         self.cursors = {}
         self.pack_propagate(False)
+        settings["CONTROLLER"] = self
+
+        # frame for showing the connection status
+        self.status = Label(self, text="Offline", font=("", 8, "bold"), fg="#FF8C00")
+        self.status.pack(side=TOP, pady=(3, 0))
+        self.create_tooltip(self.status, "connection status")
 
         # tools setting
         tools_frame = LabelFrame(self, text="Tools")
-        tools_frame.pack(side=TOP, fill=BOTH, pady=(6, 0), ipady=5)
+        tools_frame.pack(side=TOP, fill=BOTH, ipady=5)
 
         tools_btn_frame = Frame(tools_frame)
         tools_btn_frame.pack(side=TOP)
@@ -88,13 +96,23 @@ class ControlFrame(Frame):
 
         self.revert_img = PhotoImage(file="image\\revert.gif")
         revert_btn = Button(tools_btn_frame, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
-        revert_btn.grid(row=4, column=0, pady=(6, 0))
+        revert_btn.grid(row=4, column=0, pady=6)
         self.create_tooltip(revert_btn, "revert")
 
         self.save_img = PhotoImage(file="image\\save.gif")
         save_btn = Button(tools_btn_frame, image=self.save_img, cursor="hand2", command=self.save)
-        save_btn.grid(row=4, column=1, pady=(6, 0))
+        save_btn.grid(row=4, column=1, pady=6)
         self.create_tooltip(save_btn, "save")
+
+        self.broadcast_img = PhotoImage(file="image\\broadcast.gif")
+        broadcast_btn = Button(tools_btn_frame, image=self.broadcast_img, cursor="hand2", command=self.server_setting)
+        broadcast_btn.grid(row=5, column=0)
+        self.create_tooltip(broadcast_btn, "broadcast", "left")
+
+        self.connect_img = PhotoImage(file="image\\connection.gif")
+        connect_btn = Button(tools_btn_frame, image=self.connect_img, cursor="hand2", command=self.connection_setting)
+        connect_btn.grid(row=5, column=1)
+        self.create_tooltip(connect_btn, "connection")
 
         # colors setting
         color_frame = LabelFrame(self, text="Colors")
@@ -208,6 +226,12 @@ class ControlFrame(Frame):
             x2 = x1 + self.canvas.winfo_width()
             y2 = y1 + self.canvas.winfo_height()
             ImageGrab.grab().crop((x1, y1, x2, y2)).save(directory)
+
+    def server_setting(self):
+        ServerSettingWindow(self)
+
+    def connection_setting(self):
+        ClientSettingWindow(self)
 
 
 # frame for containing tool settings

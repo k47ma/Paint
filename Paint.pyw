@@ -9,7 +9,7 @@ class Paint(Tk):
 
         self.iconbitmap(r'image\paint.ico')
         self.wm_title("Paint")
-        self.geometry("900x640+0+0")
+        self.geometry("900x680+0+0")
         self.minsize(900, 640)
 
         canvas_panel = PaintCanvas(self)
