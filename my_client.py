@@ -4,6 +4,7 @@ import tkMessageBox
 from tkinter import *
 from config import settings
 
+
 # module for client side program
 
 
@@ -18,7 +19,7 @@ class ClientSettingWindow(Toplevel):
         self.resizable(False, False)
 
         container = Frame(self)
-        container.pack(side=TOP, padx=6, pady=6, fill=BOTH, expand=True)
+        container.pack(side=TOP, padx=6, pady=(6, 0), fill=BOTH, expand=True)
 
         lbl1 = Label(container, text="Host: ")
         lbl1.grid(row=0, column=0, padx=10, pady=5, sticky=E)
@@ -27,11 +28,11 @@ class ClientSettingWindow(Toplevel):
         lbl2.grid(row=1, column=0, padx=10, pady=5, sticky=E)
 
         self.host_name = Entry(container)
-        self.host_name.grid(row=0, column=1, sticky=E+W)
+        self.host_name.grid(row=0, column=1, sticky=E + W)
         self.host_name.bind("<Return>", self.create_connection)
 
         self.port_number = Entry(container)
-        self.port_number.grid(row=1, column=1, sticky=E+W)
+        self.port_number.grid(row=1, column=1, sticky=E + W)
         self.port_number.bind("<Return>", self.create_connection)
 
         self.status = Label(self, font=("", 9), fg="red")
@@ -41,44 +42,70 @@ class ClientSettingWindow(Toplevel):
         self.connect_btn.pack(side=BOTTOM, ipadx=3, ipady=1, pady=(3, 6))
 
     def create_connection(self, event=None):
-        self.status["text"] = ""
-
         host = self.host_name.get()
-        settings["HOST"] = host
-
-        try:
-            port = int(self.port_number.get())
-            settings["PORT"] = port
-        except ValueError:
-            tkMessageBox.showinfo("Error", "Please input a valid port number!")
+        if not host:
+            tkMessageBox.showinfo("Error", "Please enter a valid hostname!", parent=self)
+            self.parent.status["text"] = ""
             return
 
+        port = self.port_number.get()
         if not port:
-            tkMessageBox.showinfo("Error", "Please input a valid port number!")
+            tkMessageBox.showinfo("Error", "Please enter a valid port number!", parent=self)
+            self.parent.status["text"] = ""
             return
 
         try:
-            s = socket.socket()
-            host = settings["HOST"]
-            port = settings["PORT"]
-            s.connect((host, port))
+            port_number = int(port)
+        except ValueError:
+            tkMessageBox.showinfo("Error", "Please enter a valid port number!", parent=self)
+            self.parent.status["text"] = ""
+            return
 
-            thread = ClientThread(s)
-            thread.daemon = True
-            thread.start()
+        settings["HOST"] = host
+        settings["PORT"] = port_number
 
-            self.destroy()
+        thread = ClientThread(self, host, port_number)
+        thread.daemon = True
+        thread.start()
 
-            controller = settings["CONTROLLER"]
-            controller.status.configure(text="Connected to:\n" + host + " - " + str(port), fg="#228B22")
-        except Exception:
-            self.status["text"] = "Can't connect to the given host at given port.\nPlease check your input!"
+    def close_window(self):
+        self.destroy()
 
 
 # thread for new client connection
 class ClientThread(threading.Thread):
+    def __init__(self, parent, host, port):
+        threading.Thread.__init__(self)
+
+        self.parent = parent
+        self.host = host
+        self.port = port
+
+    def run(self):
+        self.parent.status.configure(text="Connecting...", fg="#228B22")
+
+        try:
+            self.setup_client()
+        except Exception:
+            self.parent.status.configure(
+                text="Can't connect to the given host at given port.\nPlease check your input!", fg="red")
+
+    def setup_client(self):
+        s = socket.socket()
+        s.connect((self.host, self.port))
+
+        controller = settings["CONTROLLER"]
+        controller.status.configure(text="Connected to:\n" + self.host + " - " + str(self.port), fg="#228B22")
+        self.parent.status.configure(text="Connected to:\n" + self.host + " - " + str(self.port), fg="#228B22")
+
+        thread = ClientReceivingThread(s)
+        thread.daemon = True
+        thread.start()
+
+
+# thread for listening to messages from server
+class ClientReceivingThread(threading.Thread):
     def __init__(self, connection):
         threading.Thread.__init__(self)
 
-    def run(self):
-        pass
+        self.connection = connection

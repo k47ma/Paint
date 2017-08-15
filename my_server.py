@@ -43,11 +43,11 @@ class ServerSettingWindow(Toplevel):
         try:
             port = int(self.port_number.get())
         except ValueError:
-            tkMessageBox.showinfo("Error", "Please input a valid port number!")
+            tkMessageBox.showinfo("Error", "Please input a valid port number!", parent=self)
             return
 
         if not port:
-            tkMessageBox.showinfo("Error", "Please input a valid port number!")
+            tkMessageBox.showinfo("Error", "Please input a valid port number!", parent=self)
             return
 
         settings["PORT"] = port
@@ -76,7 +76,7 @@ class ServerThread(threading.Thread):
         while True:
             client, addr = self.s.accept()
             self.set_status(addr)
-            ReceivingThread(client)
+            ServerReceivingThread(client)
 
     def set_status(self, addr):
         controller = settings["CONTROLLER"]
@@ -84,7 +84,7 @@ class ServerThread(threading.Thread):
 
 
 # listen to the client
-class ReceivingThread(threading.Thread):
+class ServerReceivingThread(threading.Thread):
     def __init__(self, client):
         threading.Thread.__init__(self)
 
