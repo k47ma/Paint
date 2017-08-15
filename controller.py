@@ -201,7 +201,7 @@ class ControlFrame(Frame):
             self.canvas.clear()
 
     def save(self):
-        directory = tkFileDialog.asksaveasfilename(filetypes=[("JPG", "*.jpg"), ("Bitmap", "*.bmp"), ("PNG", "*.png"), ("GIF", "*.gif")])
+        directory = tkFileDialog.asksaveasfilename(filetypes=[("JPG", "*.jpg"), ("Bitmap", "*.bmp"), ("PNG", "*.png"), ("GIF", "*.gif")], defaultextension=".jpg")
         if directory:
             x1 = self.parent.winfo_rootx() + self.canvas.winfo_x()
             y1 = self.parent.winfo_rooty() + self.canvas.winfo_y()
