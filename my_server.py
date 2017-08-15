@@ -87,6 +87,9 @@ class ServerThread(threading.Thread):
 class ServerReceivingThread(threading.Thread):
     def __init__(self, client):
         threading.Thread.__init__(self)
+        self.client = client
 
     def run(self):
-        pass
+        while True:
+            message = self.client.recv(1024)
+            print message

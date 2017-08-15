@@ -109,3 +109,8 @@ class ClientReceivingThread(threading.Thread):
         threading.Thread.__init__(self)
 
         self.connection = connection
+
+    def run(self):
+        while True:
+            message = self.connection.recv(1024)
+            print message
