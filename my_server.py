@@ -1,6 +1,9 @@
 import threading
 import socket
 import tkMessageBox
+import random
+import os
+from PIL import ImageGrab
 from tkinter import *
 from config import settings
 
@@ -12,7 +15,7 @@ class ServerSettingWindow(Toplevel):
         Toplevel.__init__(self, parent)
 
         self.parent = parent
-        self.wm_geometry("250x120")
+        self.wm_geometry("250x120+%d+%d" % (self.parent.winfo_rootx() + 50, self.parent.winfo_rooty() + 50))
         self.title("Server Setting")
         self.iconbitmap(r'image\paint.ico')
         self.resizable(False, False)
@@ -78,9 +81,41 @@ class ServerThread(threading.Thread):
             self.set_status(addr)
             ServerReceivingThread(client)
 
+            # send current paint to the client
+            self.send_image(client)
+
     def set_status(self, addr):
         controller = settings["CONTROLLER"]
         controller.status.configure(text="Connected from:\n" + addr[0] + " - " + str(addr[1]), fg="#228B22")
+
+    def send_image(self, client):
+        # fetch the current canvas position
+        canvas = settings["CANVAS"]
+        x1 = canvas.parent.winfo_rootx() + canvas.winfo_x()
+        y1 = canvas.parent.winfo_rooty() + canvas.winfo_y()
+        x2 = x1 + canvas.winfo_width()
+        y2 = y1 + canvas.winfo_height()
+
+        # generate a random file name and save it to gif file
+        fname = "documents\\" + hex(random.randint(10e10, 10e11))[2:] + ".gif"
+        ImageGrab.grab().crop((x1, y1, x2, y2)).save(fname)
+
+        # send file size to the client
+        fsize = os.path.getsize(fname)
+        client.send(str(fsize))
+        print "file size:", fsize
+
+        # send the image to the client
+        image = open(fname, 'rb')
+        while True:
+            string = image.read(512)
+            if not string:
+                break
+            client.send(string)
+
+        # clean up the gif image
+        image.close()
+        os.remove(fname)
 
 
 # listen to the client

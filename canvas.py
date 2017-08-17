@@ -9,6 +9,7 @@ class PaintCanvas(Canvas):
         Canvas.__init__(self, parent, bg="white")
 
         settings["CANVAS"] = self
+        self.parent = parent
         self.lastX = 0
         self.lastY = 0
         self.firstClick = True

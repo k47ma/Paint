@@ -1,6 +1,7 @@
 import threading
 import socket
 import tkMessageBox
+import random
 from tkinter import *
 from config import settings
 
@@ -13,7 +14,7 @@ class ClientSettingWindow(Toplevel):
         Toplevel.__init__(self, parent)
 
         self.parent = parent
-        self.wm_geometry("300x150")
+        self.wm_geometry("250x160+%d+%d" % (self.parent.winfo_rootx() + 50, self.parent.winfo_rooty() + 50))
         self.title("Server Setting")
         self.iconbitmap(r'image\paint.ico')
         self.resizable(False, False)
@@ -109,8 +110,31 @@ class ClientReceivingThread(threading.Thread):
         threading.Thread.__init__(self)
 
         self.connection = connection
+        self.image = None
 
     def run(self):
+        # get the file size from server
+        data = self.connection.recv(1024)
+        fsize = int(data)
+
+        # generate a random file name
+        fname = "documents\\" + hex(random.randint(10e10, 10e11))[2:] + ".gif"
+        file = open(fname, 'wb')
+
+        # receive image from server
+        received_size = 0
         while True:
-            message = self.connection.recv(1024)
-            print message
+            data = self.connection.recv(512)
+            file.write(data)
+            received_size += 512
+            if received_size >= fsize:
+                break
+        file.close()
+
+        # update client canvas
+        self.image = PhotoImage(file=fname)
+        settings["CANVAS"].create_image((0, 0), image=self.image, anchor=NW)
+
+        # listen to the server
+        while True:
+            data = self.connection.recv(1024)
