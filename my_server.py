@@ -6,6 +6,7 @@ import os
 from PIL import ImageGrab
 from tkinter import *
 from config import settings
+from ast import literal_eval as make_tuple
 
 # module for server side program
 
@@ -79,7 +80,12 @@ class ServerThread(threading.Thread):
         while True:
             client, addr = self.s.accept()
             self.set_status(addr)
-            ServerReceivingThread(client)
+            settings["CLIENT"] = client
+
+            # set up receiving thread
+            thread = ServerReceivingThread(client)
+            thread.daemon = True
+            thread.start()
 
             # send current paint to the client
             self.send_image(client)
@@ -121,9 +127,13 @@ class ServerThread(threading.Thread):
 class ServerReceivingThread(threading.Thread):
     def __init__(self, client):
         threading.Thread.__init__(self)
+
         self.client = client
 
     def run(self):
         while True:
-            message = self.client.recv(1024)
-            print message
+            data = self.client.recv(1024)
+            data = make_tuple(data)
+            canvas = settings["CANVAS"]
+            cursor = PhotoImage(file="image\\cursor2.gif")
+            canvas.create_image(data, image=cursor, anchor=NW)

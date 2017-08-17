@@ -4,6 +4,7 @@ import tkMessageBox
 import random
 from tkinter import *
 from config import settings
+from ast import literal_eval as make_tuple
 
 
 # module for client side program
@@ -94,6 +95,7 @@ class ClientThread(threading.Thread):
     def setup_client(self):
         s = socket.socket()
         s.connect((self.host, self.port))
+        settings["SERVER"] = s
 
         controller = settings["CONTROLLER"]
         controller.status.configure(text="Connected to:\n" + self.host + " - " + str(self.port), fg="#228B22")
@@ -138,3 +140,10 @@ class ClientReceivingThread(threading.Thread):
         # listen to the server
         while True:
             data = self.connection.recv(1024)
+            try:
+                data = make_tuple(data)
+                canvas = settings["CANVAS"]
+                cursor = PhotoImage(file="image\\cursor2.gif")
+                canvas.create_image(data, image=cursor, anchor=NW)
+            except ValueError:
+                continue

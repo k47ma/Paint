@@ -176,6 +176,15 @@ class ControlFrame(Frame):
     def printMousePosition(self, event):
         self.position["text"] = "(%d, %d)" % (event.x, event.y)
 
+        # send current mouse position to client or server
+        client = settings["CLIENT"]
+        if client:
+            client.send(str((event.x, event.y)))
+
+        server = settings["SERVER"]
+        if server:
+            server.send(str((event.x, event.y)))
+
     def select(self, name):
         # deselect all the buttons and select target button
         for key in self.types:
