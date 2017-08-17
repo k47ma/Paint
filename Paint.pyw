@@ -11,6 +11,7 @@ class Paint(Tk):
         self.wm_title("Paint")
         self.geometry("900x680+0+0")
         self.minsize(900, 640)
+        self["cursor"] = "@main.cur"
 
         canvas_panel = PaintCanvas(self)
         control_frame = ControlFrame(self, canvas_panel)

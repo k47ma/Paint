@@ -97,13 +97,12 @@ class ServerThread(threading.Thread):
         y2 = y1 + canvas.winfo_height()
 
         # generate a random file name and save it to gif file
-        fname = "documents\\" + hex(random.randint(10e10, 10e11))[2:] + ".gif"
+        fname = "documents\\" + hex(random.randint(10e20, 10e21))[2:][:-1] + ".gif"
         ImageGrab.grab().crop((x1, y1, x2, y2)).save(fname)
 
         # send file size to the client
         fsize = os.path.getsize(fname)
         client.send(str(fsize))
-        print "file size:", fsize
 
         # send the image to the client
         image = open(fname, 'rb')

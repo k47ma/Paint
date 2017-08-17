@@ -118,7 +118,7 @@ class ClientReceivingThread(threading.Thread):
         fsize = int(data)
 
         # generate a random file name
-        fname = "documents\\" + hex(random.randint(10e10, 10e11))[2:] + ".gif"
+        fname = "documents\\" + hex(random.randint(10e20, 10e21))[2:][:-1] + ".gif"
         file = open(fname, 'wb')
 
         # receive image from server

@@ -27,5 +27,7 @@ settings = {
     "OVERSTRIKE": False,
     "SPRAY_SIZE": 1,
     "HOST": "",
-    "PORT": 0
+    "PORT": 0,
+    "SERVER": None,
+    "CLIENT": None
 }

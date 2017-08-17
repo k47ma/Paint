@@ -37,80 +37,78 @@ class ControlFrame(Frame):
         tools_btn_frame.pack(side=TOP)
 
         self.pencil_img = PhotoImage(file="image\\pencil.gif")
-        pencil_btn = Button(tools_btn_frame, image=self.pencil_img, cursor="hand2",
-                            command=lambda: self.select("pencil"))
+        pencil_btn = Button(tools_btn_frame, image=self.pencil_img, command=lambda: self.select("pencil"))
         pencil_btn.grid(row=0, column=0)
         self.create_tooltip(pencil_btn, "pencil", "left")
         self.types["pencil"] = pencil_btn
         self.cursors["pencil"] = "@pencil.cur"
 
         self.brush_img = PhotoImage(file="image\\brush.gif")
-        brush_btn = Button(tools_btn_frame, image=self.brush_img, cursor="hand2", command=lambda: self.select("brush"))
+        brush_btn = Button(tools_btn_frame, image=self.brush_img, command=lambda: self.select("brush"))
         brush_btn.grid(row=1, column=0)
         self.create_tooltip(brush_btn, "brush", "left")
         self.types["brush"] = brush_btn
         self.cursors["brush"] = "@brush.cur"
 
         self.eraser_img = PhotoImage(file="image\\eraser.gif")
-        eraser_btn = Button(tools_btn_frame, image=self.eraser_img, cursor="hand2",
-                            command=lambda: self.select("eraser"))
+        eraser_btn = Button(tools_btn_frame, image=self.eraser_img, command=lambda: self.select("eraser"))
         eraser_btn.grid(row=2, column=0)
         self.create_tooltip(eraser_btn, "eraser", "left")
         self.types["eraser"] = eraser_btn
         self.cursors["eraser"] = "@eraser.cur"
 
         self.text_img = PhotoImage(file="image\\text.gif")
-        text_btn = Button(tools_btn_frame, image=self.text_img, cursor="hand2", command=lambda: self.select("text"))
+        text_btn = Button(tools_btn_frame, image=self.text_img, command=lambda: self.select("text"))
         text_btn.grid(row=3, column=0)
         self.create_tooltip(text_btn, "textfield", "left")
         self.types["text"] = text_btn
         self.cursors["text"] = "tcross"
 
         self.line_img = PhotoImage(file="image\\line.gif")
-        line_btn = Button(tools_btn_frame, image=self.line_img, cursor="hand2", command=lambda: self.select("line"))
+        line_btn = Button(tools_btn_frame, image=self.line_img, command=lambda: self.select("line"))
         line_btn.grid(row=0, column=1)
         self.create_tooltip(line_btn, "line")
         self.types["line"] = line_btn
         self.cursors["line"] = "plus"
 
         self.rect_img = PhotoImage(file="image\\rect.gif")
-        rect_btn = Button(tools_btn_frame, image=self.rect_img, cursor="hand2", command=lambda: self.select("rect"))
+        rect_btn = Button(tools_btn_frame, image=self.rect_img, command=lambda: self.select("rect"))
         rect_btn.grid(row=1, column=1)
         self.create_tooltip(rect_btn, "rectangle")
         self.types["rect"] = rect_btn
         self.cursors["rect"] = "tcross"
 
         self.oval_img = PhotoImage(file="image\\oval.gif")
-        circle_btn = Button(tools_btn_frame, image=self.oval_img, cursor="hand2", command=lambda: self.select("circle"))
+        circle_btn = Button(tools_btn_frame, image=self.oval_img, command=lambda: self.select("circle"))
         circle_btn.grid(row=2, column=1)
         self.create_tooltip(circle_btn, "oval")
         self.types["circle"] = circle_btn
         self.cursors["circle"] = "tcross"
 
         self.spray_img = PhotoImage(file="image\\spray.gif")
-        spray_btn = Button(tools_btn_frame, image=self.spray_img, cursor="hand2", command=lambda: self.select("spray"))
+        spray_btn = Button(tools_btn_frame, image=self.spray_img, command=lambda: self.select("spray"))
         spray_btn.grid(row=3, column=1)
         self.create_tooltip(spray_btn, "spray")
         self.types["spray"] = spray_btn
         self.cursors["spray"] = "@spray.cur"
 
         self.revert_img = PhotoImage(file="image\\revert.gif")
-        revert_btn = Button(tools_btn_frame, image=self.revert_img, cursor="hand2", command=self.canvas.revert)
+        revert_btn = Button(tools_btn_frame, image=self.revert_img, command=self.canvas.revert)
         revert_btn.grid(row=4, column=0, pady=6)
         self.create_tooltip(revert_btn, "revert")
 
         self.save_img = PhotoImage(file="image\\save.gif")
-        save_btn = Button(tools_btn_frame, image=self.save_img, cursor="hand2", command=self.save)
+        save_btn = Button(tools_btn_frame, image=self.save_img, command=self.save)
         save_btn.grid(row=4, column=1, pady=6)
         self.create_tooltip(save_btn, "save")
 
         self.broadcast_img = PhotoImage(file="image\\broadcast.gif")
-        broadcast_btn = Button(tools_btn_frame, image=self.broadcast_img, cursor="hand2", command=self.server_setting)
+        broadcast_btn = Button(tools_btn_frame, image=self.broadcast_img, command=self.server_setting)
         broadcast_btn.grid(row=5, column=0)
         self.create_tooltip(broadcast_btn, "broadcast", "left")
 
         self.connect_img = PhotoImage(file="image\\connection.gif")
-        connect_btn = Button(tools_btn_frame, image=self.connect_img, cursor="hand2", command=self.connection_setting)
+        connect_btn = Button(tools_btn_frame, image=self.connect_img, command=self.connection_setting)
         connect_btn.grid(row=5, column=1)
         self.create_tooltip(connect_btn, "connection")
 
