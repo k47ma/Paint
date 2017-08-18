@@ -148,9 +148,9 @@ class ControlFrame(Frame):
         font_color_frame.pack_propagate(False)
         font_color_frame.grid(row=1, column=2)
 
-        self.color_btn = Button(font_color_frame, bg=settings["TEXT_COLOR"], bd=2, relief=GROOVE,
+        self.text_color_btn = Button(font_color_frame, bg=settings["TEXT_COLOR"], bd=2, relief=GROOVE,
                                 activebackground=settings["TEXT_COLOR"], command=self.select_text_color)
-        self.color_btn.pack(side=TOP, fill=BOTH, expand=True)
+        self.text_color_btn.pack(side=TOP, fill=BOTH, expand=True)
 
         self.transparency_var = IntVar()
         self.transparency_var.set(1)
@@ -212,7 +212,7 @@ class ControlFrame(Frame):
                                                  title="Select Outline Color")
         if selected_color[1]:
             settings["TEXT_COLOR"] = selected_color[1]
-            self.color_btn["bg"] = settings["TEXT_COLOR"]
+            self.text_color_btn["bg"] = settings["TEXT_COLOR"]
 
     def set_transparency(self):
         settings["TRANSPARENT"] = bool(self.transparency_var.get())
@@ -226,7 +226,9 @@ class ControlFrame(Frame):
             self.canvas.clear()
 
     def save(self):
-        directory = tkFileDialog.asksaveasfilename(filetypes=[("JPG", "*.jpg"), ("Bitmap", "*.bmp"), ("PNG", "*.png"), ("GIF", "*.gif")], defaultextension=".jpg")
+        directory = tkFileDialog.asksaveasfilename(
+            filetypes=[("JPG", "*.jpg"), ("Bitmap", "*.bmp"), ("PNG", "*.png"), ("GIF", "*.gif")],
+            defaultextension=".jpg")
         if directory:
             x1 = self.parent.winfo_rootx() + self.canvas.winfo_x()
             y1 = self.parent.winfo_rooty() + self.canvas.winfo_y()
@@ -308,7 +310,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.brush_width = Scale(self, from_=20.0, to=3.0, resolution=0.1, sliderlength=25,
+            self.brush_width = Scale(self, from_=50.0, to=3.0, resolution=0.1, sliderlength=25,
                                      command=self.set_brush_width)
             self.brush_width.set(settings["BRUSH_WIDTH"])
             self.brush_width.pack(side=TOP)
@@ -384,7 +386,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.line_width = Scale(self, from_=20.0, to=1.0, resolution=0.1, sliderlength=25,
+            self.line_width = Scale(self, from_=50.0, to=1.0, resolution=0.1, sliderlength=25,
                                     command=self.set_line_width)
             self.line_width.set(settings["LINE_WIDTH"])
             self.line_width.pack(side=TOP)

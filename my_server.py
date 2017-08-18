@@ -163,6 +163,14 @@ class ServerReceivingThread(threading.Thread):
                             canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
                         else:
                             canvas.create_line(pos, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
+                    elif data["type"] == "text":
+                        # add text
+                        x, y, text, font, width, text_color = data["data"]
+                        canvas.create_text(x, y, text=text, anchor=NW, font=font, width=width, fill=text_color)
+                    elif data["type"] == "background":
+                        # add background for text
+                        pos, color, fill_color = data["data"]
+                        canvas.create_rectangle(pos, outline=color, fill=fill_color)
         except Exception:
             controller = settings["CONTROLLER"]
             host = settings["HOST"]

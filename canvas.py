@@ -79,11 +79,17 @@ class PaintCanvas(Canvas):
         self.lastX = event.x
         self.lastY = event.y
 
-    def addBrushLine(self, event):
+    def addBrushLine(self, event, eraser_mode=False):
         type = settings["BRUSH_MODE"]
         r = settings["BRUSH_WIDTH"]
         color = settings["COLOR"]
-        if settings["BRUSH_MODE"] == "circle":
+
+        if eraser_mode:
+            type = settings["ERASER_MODE"]
+            r = settings["ERASER_WIDTH"]
+            color = "white"
+
+        if type == "circle":
             line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=color,
                                     width=r, capstyle=ROUND, joinstyle=ROUND)
         else:
@@ -95,8 +101,7 @@ class PaintCanvas(Canvas):
         if socket:
             try:
                 message = {"type": "brush",
-                           "data": (type, (self.lastX, self.lastY, event.x, event.y),
-                                    settings["COLOR"], settings["BRUSH_WIDTH"])}
+                           "data": (type, (self.lastX, self.lastY, event.x, event.y), color, r)}
                 socket.send(str(message))
             except Exception:
                 pass
@@ -107,15 +112,7 @@ class PaintCanvas(Canvas):
         self.lastY = event.y
 
     def addEraserLine(self, event):
-        r = settings["ERASER_WIDTH"]
-        if settings["ERASER_MODE"] == "circle":
-            erase = self.create_oval((event.x - r, event.y - r, event.x + r, event.y + r), fill="white",
-                                     outline="white")
-            self.action.append(erase)
-        elif settings["ERASER_MODE"] == "square":
-            erase = self.create_rectangle((event.x - r, event.y - r, event.x + r, event.y + r), fill="white",
-                                          outline="white")
-            self.action.append(erase)
+        self.addBrushLine(event, True)
 
     def addLine(self, event):
         if self.action:
@@ -132,6 +129,7 @@ class PaintCanvas(Canvas):
 
             slope = float((event.y - self.lastY) / (event.x - self.lastX))
 
+            # calculate the endpoint of line
             if slope >= tan(radians(67.5)) or slope < tan(radians(112.5)):
                 line = self.create_line((self.lastX, self.lastY, self.lastX, event.y),
                                         fill=settings["COLOR"], width=settings["LINE_WIDTH"],
@@ -182,12 +180,10 @@ class PaintCanvas(Canvas):
             end_x = self.lastX + dir_x * side
             end_y = self.lastY + dir_y * side
             rect = self.create_rectangle(self.lastX, self.lastY, end_x, end_y, width=settings["RECT_WIDTH"],
-                                         outline=settings["COLOR"],
-                                         fill=fill_color)
+                                         outline=settings["COLOR"], fill=fill_color)
         else:
             # draw rectangle
-            rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y,
-                                         width=settings["RECT_WIDTH"],
+            rect = self.create_rectangle(self.lastX, self.lastY, event.x, event.y, width=settings["RECT_WIDTH"],
                                          outline=settings["COLOR"], fill=fill_color)
         self.action = [rect]
 
@@ -357,13 +353,37 @@ class PaintCanvas(Canvas):
                 y1 = self.y
                 x2 = x1 + self.width * 7
                 y2 = y1 + self.height * 15
+                color = settings["COLOR"]
+                fill_color = settings["FILL_COLOR"]
 
-                background = self.canvas.create_rectangle((x1, y1, x2, y2), outline=settings["COLOR"],
-                                                          fill=settings["FILL_COLOR"])
+                background = self.canvas.create_rectangle((x1, y1, x2, y2), outline=color, fill=fill_color)
+
+                # send background information
+                socket = settings["SOCKET"]
+                if socket:
+                    try:
+                        message = {"type": "background",
+                                   "data": ((x1, y1, x2, y2), color, fill_color)}
+                        socket.send(str(message))
+                    except Exception:
+                        pass
 
             text = self.get(1.0, END)
-            draw = self.canvas.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=self.get_font(),
-                                           width=self.width * 7, fill=settings["TEXT_COLOR"])
+            width = self.width * 7
+            text_color = settings["TEXT_COLOR"]
+            font = self.get_font()
+            draw = self.canvas.create_text(self.x + 3, self.y - 2, text=text, anchor=NW, font=font, width=width,
+                                           fill=text_color)
+
+            # send text information
+            socket = settings["SOCKET"]
+            if socket:
+                try:
+                    message = {"type": "text",
+                               "data": (self.x + 3, self.y - 2, text, font, width, text_color)}
+                    socket.send(str(message))
+                except Exception:
+                    pass
 
             if not settings["TRANSPARENT"]:
                 self.canvas.history.append([draw, background])
