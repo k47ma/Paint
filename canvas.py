@@ -61,41 +61,50 @@ class PaintCanvas(Canvas):
 
     def addPencilLine(self, event):
         line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
-                                width=settings["PENCIL_WIDTH"], capstyle=ROUND, joinstyle=ROUND, smooth=True)
+                                width=settings["PENCIL_WIDTH"], capstyle=ROUND, joinstyle=ROUND)
+
+        # send line information
+        socket = settings["SOCKET"]
+        if socket:
+            try:
+                message = {"type": "pencil",
+                           "data": ((self.lastX, self.lastY, event.x, event.y),
+                                    settings["COLOR"], settings["PENCIL_WIDTH"])}
+                socket.send(str(message))
+            except Exception:
+                pass
+
         self.points.extend([event.x, event.y])
         self.action.append(line)
         self.lastX = event.x
         self.lastY = event.y
 
-        # send line
-        socket = settings["SOCKET"]
-        if socket:
-            try:
-                message = {"type": "pencil", "data": (
-                (self.lastX, self.lastY, event.x, event.y), settings["COLOR"], settings["PENCIL_WIDTH"])}
-                socket.send(str(message))
-            except Exception:
-                pass
-
     def addBrushLine(self, event):
+        type = settings["BRUSH_MODE"]
         r = settings["BRUSH_WIDTH"]
         color = settings["COLOR"]
         if settings["BRUSH_MODE"] == "circle":
             line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=color,
                                     width=r, capstyle=ROUND, joinstyle=ROUND)
-
-            self.points.extend([event.x, event.y])
-            self.action.append(line)
-            self.lastX = event.x
-            self.lastY = event.y
         else:
             line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=color,
                                     width=r, capstyle=PROJECTING, joinstyle=BEVEL)
 
-            self.points.extend([event.x, event.y])
-            self.action.append(line)
-            self.lastX = event.x
-            self.lastY = event.y
+        # send line information
+        socket = settings["SOCKET"]
+        if socket:
+            try:
+                message = {"type": "brush",
+                           "data": (type, (self.lastX, self.lastY, event.x, event.y),
+                                    settings["COLOR"], settings["BRUSH_WIDTH"])}
+                socket.send(str(message))
+            except Exception:
+                pass
+
+        self.points.extend([event.x, event.y])
+        self.action.append(line)
+        self.lastX = event.x
+        self.lastY = event.y
 
     def addEraserLine(self, event):
         r = settings["ERASER_WIDTH"]

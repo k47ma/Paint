@@ -148,7 +148,14 @@ class ServerReceivingThread(threading.Thread):
                         elif data["type"] == "pencil":
                             # add pencil line
                             pos, color, width = data["data"]
-                            canvas.create_line(pos, fill=color, width=width)
+                            canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                        elif data["type"] == "brush":
+                            # add brush line
+                            type, pos, color, width = data["data"]
+                            if type == "circle":
+                                canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                            else:
+                                canvas.create_line(pos, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
                     except ValueError:
                         continue
                     except TypeError:
@@ -158,11 +165,3 @@ class ServerReceivingThread(threading.Thread):
             host = settings["HOST"]
             port = settings["PORT"]
             controller.status.configure(text="Waiting for connection...\n" + host + " - " + str(port), fg="#6495ED")
-
-
-# send information to the client
-class ServerSendingThread(threading.Thread):
-    def __init__(self, client):
-        threading.Thread.__init__(self)
-
-        self.client = client
