@@ -96,7 +96,7 @@ class ServerThread(threading.Thread):
         controller.status.configure(text="Connected from:\n" + addr[0] + " - " + str(addr[1]), fg="#228B22")
 
     def send_image(self, client):
-        # fetch the current canvas position
+        # fetch the current canvas coordsition
         canvas = settings["CANVAS"]
         x1 = canvas.parent.winfo_rootx() + canvas.winfo_x()
         y1 = canvas.parent.winfo_rooty() + canvas.winfo_y()
@@ -130,6 +130,7 @@ class ServerReceivingThread(threading.Thread):
         threading.Thread.__init__(self)
 
         self.client = client
+        self.last_draw = None
 
     def run(self):
         try:
@@ -148,29 +149,40 @@ class ServerReceivingThread(threading.Thread):
                     canvas = settings["CANVAS"]
 
                     if data["type"] == "mouse":
-                        # update mouse position
-                        pos = data["data"]
+                        # update mouse coordsition
+                        coords = data["data"]
                         cursor = PhotoImage(file="image\\cursor2.gif")
-                        canvas.create_image(pos, image=cursor, anchor=NW)
+                        canvas.create_image(coords, image=cursor, anchor=NW)
                     elif data["type"] == "pencil":
                         # add pencil line
-                        pos, color, width = data["data"]
-                        canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                        coords, color, width = data["data"]
+                        canvas.create_line(coords, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
                     elif data["type"] == "brush":
                         # add brush line
-                        type, pos, color, width = data["data"]
+                        type, coords, color, width = data["data"]
                         if type == "circle":
-                            canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                            canvas.create_line(coords, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
                         else:
-                            canvas.create_line(pos, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
+                            canvas.create_line(coords, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
                     elif data["type"] == "text":
                         # add text
                         x, y, text, font, width, text_color = data["data"]
                         canvas.create_text(x, y, text=text, anchor=NW, font=font, width=width, fill=text_color)
                     elif data["type"] == "background":
                         # add background for text
-                        pos, color, fill_color = data["data"]
-                        canvas.create_rectangle(pos, outline=color, fill=fill_color)
+                        coords, color, fill_color = data["data"]
+                        canvas.create_rectangle(coords, outline=color, fill=fill_color)
+                    elif data["type"] == "line":
+                        # clear last line
+                        if self.last_draw:
+                            canvas.delete(self.last_draw)
+
+                        # add new line
+                        coords, color, width = data["data"]
+                        line = canvas.create_line(coords, fill=color, width=width, capstyle=ROUND)
+                        self.last_draw = line
+                    elif data["type"] == "set":
+                        self.last_draw = None
         except Exception:
             controller = settings["CONTROLLER"]
             host = settings["HOST"]

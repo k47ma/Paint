@@ -114,6 +114,7 @@ class ClientReceivingThread(threading.Thread):
 
         self.connection = connection
         self.image = None
+        self.last_draw = None
 
     def run(self):
         # get the file size from server
@@ -178,6 +179,17 @@ class ClientReceivingThread(threading.Thread):
                         # add background for text
                         pos, color, fill_color = data["data"]
                         canvas.create_rectangle(pos, outline=color, fill=fill_color)
+                    elif data["type"] == "line":
+                        # clear last line
+                        if self.last_draw:
+                            canvas.delete(self.last_draw)
+
+                        # add new line
+                        coords, color, width = data["data"]
+                        line = canvas.create_line(coords, fill=color, width=width, capstyle=ROUND)
+                        self.last_draw = line
+                    elif data["type"] == "set":
+                        self.last_draw = None
         except Exception:
             controller = settings["CONTROLLER"]
             controller.status.configure(text="Offline", fg="#FF8C00")

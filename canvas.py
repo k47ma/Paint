@@ -124,6 +124,7 @@ class PaintCanvas(Canvas):
                 line = self.create_line((self.lastX, self.lastY, self.lastX, event.y),
                                         fill=settings["COLOR"], width=settings["LINE_WIDTH"],
                                         capstyle=ROUND)
+                self.sendLine((self.lastX, self.lastY, self.lastX, event.y))
                 self.action = [line]
                 return
 
@@ -134,23 +135,28 @@ class PaintCanvas(Canvas):
                 line = self.create_line((self.lastX, self.lastY, self.lastX, event.y),
                                         fill=settings["COLOR"], width=settings["LINE_WIDTH"],
                                         capstyle=ROUND)
+                self.sendLine((self.lastX, self.lastY, self.lastX, event.y))
             elif tan(radians(-22.5)) <= slope < tan(radians(22.5)):
                 line = self.create_line((self.lastX, self.lastY, event.x, self.lastY),
                                         fill=settings["COLOR"], width=settings["LINE_WIDTH"],
                                         capstyle=ROUND)
+                self.sendLine((self.lastX, self.lastY, event.x, self.lastY))
             elif tan(radians(22.5)) <= slope < tan(radians(67.5)):
                 end_x = int(round((self.lastX + event.x - self.lastY + event.y) / 2))
                 end_y = int(round((event.x - self.lastX + event.y + self.lastY) / 2))
                 line = self.create_line((self.lastX, self.lastY, end_x, end_y), fill=settings["COLOR"],
                                         width=settings["LINE_WIDTH"], capstyle=ROUND)
+                self.sendLine((self.lastX, self.lastY, end_x, end_y))
             else:
                 end_x = int(round((self.lastX + event.x + self.lastY - event.y) / 2))
                 end_y = int(round((self.lastX - event.x + self.lastY + event.y) / 2))
                 line = self.create_line((self.lastX, self.lastY, end_x, end_y), fill=settings["COLOR"],
                                         width=settings["LINE_WIDTH"], capstyle=ROUND)
+                self.sendLine((self.lastX, self.lastY, end_x, end_y))
         else:
             line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
                                     width=settings["LINE_WIDTH"], capstyle=ROUND)
+            self.sendLine((self.lastX, self.lastY, event.x, event.y))
         self.action = [line]
 
     def addRect(self, event):
@@ -319,11 +325,31 @@ class PaintCanvas(Canvas):
         else:
             self.history.append(self.action)
 
+        # send setDraw command
+        socket = settings["SOCKET"]
+        if socket:
+            try:
+                message = {"type": "set", "data": None}
+                socket.send(str(message))
+            except Exception:
+                pass
+
         self.firstClick = True
         self.action = []
 
     def clear(self):
         self.delete("all")
+
+    def sendLine(self, coords):
+        # send line information
+        socket = settings["SOCKET"]
+        if socket:
+            try:
+                message = {"type": "line",
+                           "data": (coords, settings["COLOR"], settings["LINE_WIDTH"])}
+                socket.send(str(message))
+            except Exception:
+                pass
 
     class PaintText(Text):
         def __init__(self, canvas, x, y, width, height):

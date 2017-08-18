@@ -292,10 +292,10 @@ class SettingFrame(LabelFrame):
         def __init__(self, parent):
             Frame.__init__(self, parent)
 
-            label = Label(self, text="Width")
-            label.pack(side=TOP, pady=(6, 0))
+            label1 = Label(self, text="Width")
+            label1.pack(side=TOP, pady=(6, 0))
 
-            self.pencil_width = Scale(self, from_=5.0, to=1.0, resolution=0.1, sliderlength=25,
+            self.pencil_width = Scale(self, from_=1.0, to=5.0, resolution=0.1, sliderlength=25, orient=HORIZONTAL,
                                       command=self.set_pencil_width)
             self.pencil_width.set(settings["PENCIL_WIDTH"])
             self.pencil_width.pack(side=TOP)
@@ -310,7 +310,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.brush_width = Scale(self, from_=50.0, to=3.0, resolution=0.1, sliderlength=25,
+            self.brush_width = Scale(self, from_=3.0, to=50.0, resolution=0.1, sliderlength=25, orient=HORIZONTAL,
                                      command=self.set_brush_width)
             self.brush_width.set(settings["BRUSH_WIDTH"])
             self.brush_width.pack(side=TOP)
@@ -348,7 +348,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.eraser_width = Scale(self, from_=40.0, to=3.0, resolution=0.1, sliderlength=25,
+            self.eraser_width = Scale(self, from_=3.0, to=50.0, resolution=0.1, sliderlength=25, orient=HORIZONTAL,
                                       command=self.set_eraser_width)
             self.eraser_width.set(settings["ERASER_WIDTH"])
             self.eraser_width.pack(side=TOP)
@@ -386,7 +386,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.line_width = Scale(self, from_=50.0, to=1.0, resolution=0.1, sliderlength=25,
+            self.line_width = Scale(self, from_=1.0, to=10.0, resolution=0.1, sliderlength=25, orient=HORIZONTAL,
                                     command=self.set_line_width)
             self.line_width.set(settings["LINE_WIDTH"])
             self.line_width.pack(side=TOP)
@@ -401,7 +401,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.rect_width = Scale(self, from_=5.0, to=1.0, resolution=0.1, sliderlength=25,
+            self.rect_width = Scale(self, from_=1.0, to=5.0, resolution=0.1, sliderlength=25, orient=HORIZONTAL,
                                     command=self.set_rect_width)
             self.rect_width.set(settings["RECT_WIDTH"])
             self.rect_width.pack(side=TOP)
@@ -416,7 +416,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Width")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.circle_width = Scale(self, from_=5.0, to=1.0, resolution=0.1, sliderlength=25,
+            self.circle_width = Scale(self, from_=1.0, to=5.0, resolution=0.1, sliderlength=25, orient=HORIZONTAL,
                                       command=self.set_circle_width)
             self.circle_width.set(settings["CIRCLE_WIDTH"])
             self.circle_width.pack(side=TOP)
@@ -533,10 +533,10 @@ class SettingFrame(LabelFrame):
         def __init__(self, parent):
             Frame.__init__(self, parent)
 
-            label = Label(self, text="Size")
-            label.pack(side=TOP, pady=(6, 0))
+            label1 = Label(self, text="Size")
+            label1.pack(side=TOP, pady=(6, 0))
 
-            self.spray_size = Scale(self, from_=10, to=1, resolution=1, sliderlength=25,
+            self.spray_size = Scale(self, from_=1, to=10, resolution=1, sliderlength=25, orient=HORIZONTAL,
                                     command=self.set_spray_size)
             self.spray_size.set(settings["SPRAY_SIZE"])
             self.spray_size.pack(side=TOP)
