@@ -179,11 +179,17 @@ class ControlFrame(Frame):
         # send current mouse position to client or server
         client = settings["CLIENT"]
         if client:
-            client.send(str((event.x, event.y)))
+            try:
+                client.send(str((event.x, event.y)))
+            except Exception:
+                pass
 
         server = settings["SERVER"]
         if server:
-            server.send(str((event.x, event.y)))
+            try:
+                server.send(str((event.x, event.y)))
+            except Exception:
+                pass
 
     def select(self, name):
         # deselect all the buttons and select target button

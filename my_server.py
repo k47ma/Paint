@@ -131,9 +131,28 @@ class ServerReceivingThread(threading.Thread):
         self.client = client
 
     def run(self):
-        while True:
-            data = self.client.recv(1024)
-            data = make_tuple(data)
-            canvas = settings["CANVAS"]
-            cursor = PhotoImage(file="image\\cursor2.gif")
-            canvas.create_image(data, image=cursor, anchor=NW)
+        try:
+            while True:
+                try:
+                    data = self.client.recv(1024)
+                    data = make_tuple(data)
+                    canvas = settings["CANVAS"]
+                    cursor = PhotoImage(file="image\\cursor2.gif")
+                    canvas.create_image(data, image=cursor, anchor=NW)
+                except ValueError:
+                    continue
+                except TypeError:
+                    continue
+        except Exception:
+            controller = settings["CONTROLLER"]
+            host = settings["HOST"]
+            port = settings["PORT"]
+            controller.status.configure(text="Waiting for connection...\n" + host + " - " + str(port), fg="#6495ED")
+
+
+# send information to the client
+class ServerSendingThread(threading.Thread):
+    def __init__(self, client):
+        threading.Thread.__init__(self)
+
+        self.client = client

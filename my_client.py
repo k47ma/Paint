@@ -100,6 +100,7 @@ class ClientThread(threading.Thread):
         controller = settings["CONTROLLER"]
         controller.status.configure(text="Connected to:\n" + self.host + " - " + str(self.port), fg="#228B22")
         self.parent.status.configure(text="Connected to:\n" + self.host + " - " + str(self.port), fg="#228B22")
+        self.parent.connect_btn["state"] = DISABLED
 
         thread = ClientReceivingThread(s)
         thread.daemon = True
@@ -138,12 +139,26 @@ class ClientReceivingThread(threading.Thread):
         settings["CANVAS"].create_image((0, 0), image=self.image, anchor=NW)
 
         # listen to the server
-        while True:
-            data = self.connection.recv(1024)
-            try:
-                data = make_tuple(data)
-                canvas = settings["CANVAS"]
-                cursor = PhotoImage(file="image\\cursor2.gif")
-                canvas.create_image(data, image=cursor, anchor=NW)
-            except ValueError:
-                continue
+        try:
+            while True:
+                data = self.connection.recv(1024)
+                try:
+                    data = make_tuple(data)
+                    canvas = settings["CANVAS"]
+                    cursor = PhotoImage(file="image\\cursor2.gif")
+                    canvas.create_image(data, image=cursor, anchor=NW)
+                except ValueError:
+                    continue
+                except TypeError:
+                    continue
+        except Exception:
+            controller = settings["CONTROLLER"]
+            controller.status.configure(text="Offline", fg="#FF8C00")
+
+
+# send information to the server
+class ClientSendingThread(threading.Thread):
+    def __init__(self, connection):
+        threading.Thread.__init__(self)
+
+        self.connection = connection
