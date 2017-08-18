@@ -4,7 +4,7 @@ import tkMessageBox
 import random
 from tkinter import *
 from config import settings
-from ast import literal_eval as make_tuple
+from ast import literal_eval
 
 
 # module for client side program
@@ -16,7 +16,7 @@ class ClientSettingWindow(Toplevel):
 
         self.parent = parent
         self.wm_geometry("250x160+%d+%d" % (self.parent.winfo_rootx() + 50, self.parent.winfo_rooty() + 50))
-        self.title("Server Setting")
+        self.title("Client Setting")
         self.iconbitmap(r'image\paint.ico')
         self.resizable(False, False)
 
@@ -95,7 +95,7 @@ class ClientThread(threading.Thread):
     def setup_client(self):
         s = socket.socket()
         s.connect((self.host, self.port))
-        settings["SERVER"] = s
+        settings["SOCKET"] = s
 
         controller = settings["CONTROLLER"]
         controller.status.configure(text="Connected to:\n" + self.host + " - " + str(self.port), fg="#228B22")
@@ -141,16 +141,27 @@ class ClientReceivingThread(threading.Thread):
         # listen to the server
         try:
             while True:
-                data = self.connection.recv(1024)
-                try:
-                    data = make_tuple(data)
+                datas = self.connection.recv(1024)
+                for data in re.findall("{.*?}", datas):
+
+                    data = literal_eval(data)
                     canvas = settings["CANVAS"]
-                    cursor = PhotoImage(file="image\\cursor2.gif")
-                    canvas.create_image(data, image=cursor, anchor=NW)
-                except ValueError:
-                    continue
-                except TypeError:
-                    continue
+
+                    if data["type"] == "mouse":
+                        # update mouse position
+                        pos = data["data"]
+                        cursor = PhotoImage(file="image\\cursor2.gif")
+                        canvas.create_image(pos, image=cursor, anchor=NW)
+                    elif data["type"] == "pencil":
+                        # add pencil line
+                        pos, color, width = data["data"]
+                        canvas.create_line(pos, fill=color, width=width)
+                    """
+                    except ValueError:
+                        continue
+                    except TypeError:
+                        continue
+                    """
         except Exception:
             controller = settings["CONTROLLER"]
             controller.status.configure(text="Offline", fg="#FF8C00")

@@ -15,6 +15,7 @@ class PaintCanvas(Canvas):
         self.firstClick = True
         self.history = []
         self.action = []
+        self.points = []
         self.entry = None
         self.controller = None
         self.bitmaps = []
@@ -31,6 +32,7 @@ class PaintCanvas(Canvas):
     def startDraw(self, event):
         if self.firstClick:
             self.lastX, self.lastY = event.x, event.y
+            self.points.extend([event.x, event.y])
             self.firstClick = False
         if self.type == "text" and self.entry:
             self.entry.draw_text()
@@ -59,21 +61,39 @@ class PaintCanvas(Canvas):
 
     def addPencilLine(self, event):
         line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
-                                width=settings["PENCIL_WIDTH"])
+                                width=settings["PENCIL_WIDTH"], capstyle=ROUND, joinstyle=ROUND)
         self.action.append(line)
         self.lastX = event.x
         self.lastY = event.y
 
+        # send line
+        socket = settings["SOCKET"]
+        if socket:
+            try:
+                message = {"type": "pencil", "data": ((self.lastX, self.lastY, event.x, event.y), settings["COLOR"], settings["PENCIL_WIDTH"])}
+                socket.send(str(message))
+            except Exception:
+                pass
+
     def addBrushLine(self, event):
         r = settings["BRUSH_WIDTH"]
+        color = settings["COLOR"]
         if settings["BRUSH_MODE"] == "circle":
-            oval = self.create_oval((event.x - r, event.y - r, event.x + r, event.y + r), fill=settings["COLOR"],
-                                    outline=settings["COLOR"])
-            self.action.append(oval)
-        elif settings["BRUSH_MODE"] == "square":
-            oval = self.create_rectangle((event.x - r, event.y - r, event.x + r, event.y + r), fill=settings["COLOR"],
-                                         outline=settings["COLOR"])
-            self.action.append(oval)
+            line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=color,
+                                    width=r, capstyle=ROUND, joinstyle=ROUND)
+
+            self.points.extend([event.x, event.y])
+            self.action.append(line)
+            self.lastX = event.x
+            self.lastY = event.y
+        else:
+            line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=color,
+                                    width=r, capstyle=PROJECTING, joinstyle=BEVEL)
+
+            self.points.extend([event.x, event.y])
+            self.action.append(line)
+            self.lastX = event.x
+            self.lastY = event.y
 
     def addEraserLine(self, event):
         r = settings["ERASER_WIDTH"]
@@ -259,6 +279,22 @@ class PaintCanvas(Canvas):
 
             paint_text = self.PaintText(self, x1, y1, char_width, char_height)
             paint_text.place(x=x1, y=y1, anchor=NW)
+        elif self.type == "brush":
+            # clear brush line
+            for action in self.action:
+                self.delete(action)
+
+            # draw a single brush line
+            type = settings["BRUSH_MODE"]
+            color = settings["COLOR"]
+            width = settings["BRUSH_WIDTH"]
+            if type == "circle":
+                line = self.create_line(tuple(self.points), fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+            else:
+                line = self.create_line(tuple(self.points), fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
+
+            self.points = []
+            self.history.append([line])
         else:
             self.history.append(self.action)
 

@@ -3,10 +3,11 @@ import socket
 import tkMessageBox
 import random
 import os
+import re
 from PIL import ImageGrab
 from tkinter import *
 from config import settings
-from ast import literal_eval as make_tuple
+from ast import literal_eval
 
 # module for server side program
 
@@ -80,7 +81,7 @@ class ServerThread(threading.Thread):
         while True:
             client, addr = self.s.accept()
             self.set_status(addr)
-            settings["CLIENT"] = client
+            settings["SOCKET"] = client
 
             # set up receiving thread
             thread = ServerReceivingThread(client)
@@ -133,16 +134,25 @@ class ServerReceivingThread(threading.Thread):
     def run(self):
         try:
             while True:
-                try:
-                    data = self.client.recv(1024)
-                    data = make_tuple(data)
-                    canvas = settings["CANVAS"]
-                    cursor = PhotoImage(file="image\\cursor2.gif")
-                    canvas.create_image(data, image=cursor, anchor=NW)
-                except ValueError:
-                    continue
-                except TypeError:
-                    continue
+                datas = self.client.recv(1024)
+                for data in re.findall("{.*?}", datas):
+                    try:
+                        data = literal_eval(data)
+                        canvas = settings["CANVAS"]
+
+                        if data["type"] == "mouse":
+                            # update mouse position
+                            pos = data["data"]
+                            cursor = PhotoImage(file="image\\cursor2.gif")
+                            canvas.create_image(pos, image=cursor, anchor=NW)
+                        elif data["type"] == "pencil":
+                            # add pencil line
+                            pos, color, width = data["data"]
+                            canvas.create_line(pos, fill=color, width=width)
+                    except ValueError:
+                        continue
+                    except TypeError:
+                        continue
         except Exception:
             controller = settings["CONTROLLER"]
             host = settings["HOST"]

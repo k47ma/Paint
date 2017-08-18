@@ -28,6 +28,5 @@ settings = {
     "SPRAY_SIZE": 1,
     "HOST": "",
     "PORT": 0,
-    "SERVER": None,
-    "CLIENT": None
+    "SOCKET": None
 }

@@ -177,17 +177,11 @@ class ControlFrame(Frame):
         self.position["text"] = "(%d, %d)" % (event.x, event.y)
 
         # send current mouse position to client or server
-        client = settings["CLIENT"]
-        if client:
+        socket = settings["SOCKET"]
+        if socket:
             try:
-                client.send(str((event.x, event.y)))
-            except Exception:
-                pass
-
-        server = settings["SERVER"]
-        if server:
-            try:
-                server.send(str((event.x, event.y)))
+                message = {"type": "mouse", "data": (event.x, event.y)}
+                socket.send(str(message))
             except Exception:
                 pass
 
