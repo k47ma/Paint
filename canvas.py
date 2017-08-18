@@ -61,7 +61,8 @@ class PaintCanvas(Canvas):
 
     def addPencilLine(self, event):
         line = self.create_line((self.lastX, self.lastY, event.x, event.y), fill=settings["COLOR"],
-                                width=settings["PENCIL_WIDTH"], capstyle=ROUND, joinstyle=ROUND)
+                                width=settings["PENCIL_WIDTH"], capstyle=ROUND, joinstyle=ROUND, smooth=True)
+        self.points.extend([event.x, event.y])
         self.action.append(line)
         self.lastX = event.x
         self.lastY = event.y
@@ -70,7 +71,8 @@ class PaintCanvas(Canvas):
         socket = settings["SOCKET"]
         if socket:
             try:
-                message = {"type": "pencil", "data": ((self.lastX, self.lastY, event.x, event.y), settings["COLOR"], settings["PENCIL_WIDTH"])}
+                message = {"type": "pencil", "data": (
+                (self.lastX, self.lastY, event.x, event.y), settings["COLOR"], settings["PENCIL_WIDTH"])}
                 socket.send(str(message))
             except Exception:
                 pass
@@ -260,7 +262,8 @@ class PaintCanvas(Canvas):
             self.delete(action)
 
     def setDraw(self, event=None):
-        if self.type == "text":
+        type = self.type
+        if type == "text":
             try:
                 (x1, y1, x2, y2) = self.coords(self.action[0])
             except IndexError:
@@ -279,19 +282,32 @@ class PaintCanvas(Canvas):
 
             paint_text = self.PaintText(self, x1, y1, char_width, char_height)
             paint_text.place(x=x1, y=y1, anchor=NW)
-        elif self.type == "brush":
-            # clear brush line
+        elif type == "pencil":
+            # clear pencil lines
             for action in self.action:
                 self.delete(action)
 
-            # draw a single brush line
+            # draw a single smooth pencil line
+            line = self.create_line(tuple(self.points), fill=settings["COLOR"], width=settings["PENCIL_WIDTH"],
+                                    capstyle=ROUND, joinstyle=ROUND, smooth=True)
+
+            self.points = []
+            self.history.append([line])
+        elif type == "brush":
+            # clear brush lines
+            for action in self.action:
+                self.delete(action)
+
+            # draw a single smooth brush line
             type = settings["BRUSH_MODE"]
             color = settings["COLOR"]
             width = settings["BRUSH_WIDTH"]
             if type == "circle":
-                line = self.create_line(tuple(self.points), fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                line = self.create_line(tuple(self.points), fill=color, width=width, capstyle=ROUND, joinstyle=ROUND,
+                                        smooth=True)
             else:
-                line = self.create_line(tuple(self.points), fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
+                line = self.create_line(tuple(self.points), fill=color, width=width, capstyle=PROJECTING,
+                                        joinstyle=BEVEL, smooth=True)
 
             self.points = []
             self.history.append([line])
