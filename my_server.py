@@ -138,28 +138,31 @@ class ServerReceivingThread(threading.Thread):
                 for data in re.findall("{.*?}", datas):
                     try:
                         data = literal_eval(data)
-                        canvas = settings["CANVAS"]
-
-                        if data["type"] == "mouse":
-                            # update mouse position
-                            pos = data["data"]
-                            cursor = PhotoImage(file="image\\cursor2.gif")
-                            canvas.create_image(pos, image=cursor, anchor=NW)
-                        elif data["type"] == "pencil":
-                            # add pencil line
-                            pos, color, width = data["data"]
-                            canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
-                        elif data["type"] == "brush":
-                            # add brush line
-                            type, pos, color, width = data["data"]
-                            if type == "circle":
-                                canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
-                            else:
-                                canvas.create_line(pos, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
                     except ValueError:
                         continue
                     except TypeError:
                         continue
+                    except SyntaxError:
+                        continue
+
+                    canvas = settings["CANVAS"]
+
+                    if data["type"] == "mouse":
+                        # update mouse position
+                        pos = data["data"]
+                        cursor = PhotoImage(file="image\\cursor2.gif")
+                        canvas.create_image(pos, image=cursor, anchor=NW)
+                    elif data["type"] == "pencil":
+                        # add pencil line
+                        pos, color, width = data["data"]
+                        canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                    elif data["type"] == "brush":
+                        # add brush line
+                        type, pos, color, width = data["data"]
+                        if type == "circle":
+                            canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                        else:
+                            canvas.create_line(pos, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
         except Exception:
             controller = settings["CONTROLLER"]
             host = settings["HOST"]
