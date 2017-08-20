@@ -131,59 +131,117 @@ class ServerReceivingThread(threading.Thread):
 
         self.client = client
         self.last_draw = None
+        self.history = []
+        self.bitmaps = []
 
     def run(self):
         try:
             while True:
-                datas = self.client.recv(1024)
-                for data in re.findall("{.*?}", datas):
-                    try:
-                        data = literal_eval(data)
-                    except ValueError:
-                        continue
-                    except TypeError:
-                        continue
-                    except SyntaxError:
-                        continue
+                    datas = self.client.recv(1024)
+                    for data in re.findall("{.*?}", datas):
+                        try:
+                            data = literal_eval(data)
+                        except ValueError:
+                            continue
+                        except TypeError:
+                            continue
+                        except SyntaxError:
+                            continue
 
-                    canvas = settings["CANVAS"]
+                        canvas = settings["CANVAS"]
 
-                    if data["type"] == "mouse":
-                        # update mouse coordsition
-                        coords = data["data"]
-                        cursor = PhotoImage(file="image\\cursor2.gif")
-                        canvas.create_image(coords, image=cursor, anchor=NW)
-                    elif data["type"] == "pencil":
-                        # add pencil line
-                        coords, color, width = data["data"]
-                        canvas.create_line(coords, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
-                    elif data["type"] == "brush":
-                        # add brush line
-                        type, coords, color, width = data["data"]
-                        if type == "circle":
-                            canvas.create_line(coords, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
-                        else:
-                            canvas.create_line(coords, fill=color, width=width, capstyle=PROJECTING, joinstyle=BEVEL)
-                    elif data["type"] == "text":
-                        # add text
-                        x, y, text, font, width, text_color = data["data"]
-                        canvas.create_text(x, y, text=text, anchor=NW, font=font, width=width, fill=text_color)
-                    elif data["type"] == "background":
-                        # add background for text
-                        coords, color, fill_color = data["data"]
-                        canvas.create_rectangle(coords, outline=color, fill=fill_color)
-                    elif data["type"] == "line":
-                        # clear last line
-                        if self.last_draw:
-                            canvas.delete(self.last_draw)
-
-                        # add new line
-                        coords, color, width = data["data"]
-                        line = canvas.create_line(coords, fill=color, width=width, capstyle=ROUND)
-                        self.last_draw = line
-                    elif data["type"] == "set":
-                        self.last_draw = None
-        except Exception:
+                        if data["type"] == "mouse":
+                            # update mouse position
+                            pos = data["data"]
+                            cursor = PhotoImage(file="image\\cursor2.gif")
+                            canvas.create_image(pos, image=cursor, anchor=NW)
+                        elif data["type"] == "pencil":
+                            if not self.last_draw:
+                                self.last_draw = []
+                            # add pencil line
+                            pos, color, width = data["data"]
+                            line = canvas.create_line(pos, fill=color, width=width, capstyle=ROUND, joinstyle=ROUND)
+                            self.last_draw.append(line)
+                            self.history.append(line)
+                        elif data["type"] == "brush":
+                            if not self.last_draw:
+                                self.last_draw = []
+                            # add brush line
+                            brush_type, pos, color, width = data["data"]
+                            if brush_type == "circle":
+                                brush = canvas.create_line(pos, fill=color, width=width, capstyle=ROUND,
+                                                           joinstyle=ROUND)
+                            else:
+                                brush = canvas.create_line(pos, fill=color, width=width, capstyle=PROJECTING,
+                                                           joinstyle=BEVEL)
+                            self.last_draw.append(brush)
+                            self.history.append(brush)
+                        elif data["type"] == "textarea":
+                            text_data = data["data"]["text"]
+                            background_data = data["data"]["background"]
+                            action = []
+                            if background_data:
+                                # add background for text
+                                coords, color, fill_color = background_data
+                                background = canvas.create_rectangle(coords, outline=color, fill=fill_color)
+                                action.append(background)
+                            # add text
+                            x, y, text, font, width, text_color = text_data
+                            text = canvas.create_text(x, y, text=text, anchor=NW, font=font, width=width,
+                                                      fill=text_color)
+                            action.append(text)
+                            self.history.append(action)
+                        elif data["type"] == "line":
+                            # clear last line
+                            if self.last_draw:
+                                canvas.delete(self.last_draw)
+                            # add new line
+                            coords, color, width = data["data"]
+                            line = canvas.create_line(coords, fill=color, width=width, capstyle=ROUND)
+                            self.last_draw = line
+                        elif data["type"] == "set":
+                            if self.last_draw:
+                                self.history.append(self.last_draw)
+                            self.last_draw = None
+                        elif data["type"] == "rect":
+                            # clear last rectangle
+                            if self.last_draw:
+                                canvas.delete(self.last_draw)
+                            # add new rectangle
+                            coords, width, color, fill_color = data["data"]
+                            rect = canvas.create_rectangle(coords, width=width, outline=color, fill=fill_color)
+                            self.last_draw = rect
+                        elif data["type"] == "circle":
+                            # clear last circle
+                            if self.last_draw:
+                                canvas.delete(self.last_draw)
+                            # add new circle
+                            coords, width, color, fill_color = data["data"]
+                            circle = canvas.create_oval(coords, width=width, outline=color, fill=fill_color)
+                            self.last_draw = circle
+                        elif data["type"] == "spray":
+                            if not self.last_draw:
+                                self.last_draw = []
+                            # add spray
+                            coords, spray_size = data["data"]
+                            image = PhotoImage(file="image\\shaped_spray.gif")
+                            zoomed_image = image.zoom(spray_size)
+                            self.bitmaps.append(zoomed_image)
+                            spray = canvas.create_image(coords, image=self.bitmaps[-1])
+                            self.last_draw.append(spray)
+                        elif data["type"] == "revert":
+                            # get the last action
+                            try:
+                                last_action = self.history.pop()
+                            except IndexError:
+                                continue
+                            # delete last action from canvas
+                            if type(last_action) is int:
+                                canvas.delete(last_action)
+                            else:
+                                for action in last_action:
+                                    canvas.delete(action)
+        except socket.error:
             controller = settings["CONTROLLER"]
             host = settings["HOST"]
             port = settings["PORT"]

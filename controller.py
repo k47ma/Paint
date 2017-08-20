@@ -536,7 +536,7 @@ class SettingFrame(LabelFrame):
             label1 = Label(self, text="Size")
             label1.pack(side=TOP, pady=(6, 0))
 
-            self.spray_size = Scale(self, from_=1, to=10, resolution=1, sliderlength=25, orient=HORIZONTAL,
+            self.spray_size = Scale(self, from_=1, to=3, resolution=1, sliderlength=25, orient=HORIZONTAL,
                                     command=self.set_spray_size)
             self.spray_size.set(settings["SPRAY_SIZE"])
             self.spray_size.pack(side=TOP)
