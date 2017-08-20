@@ -450,8 +450,7 @@ class PaintCanvas(Canvas):
             if socket:
                 try:
                     message = {"type": "textarea",
-                               "data": {"text": (self.x + 3, self.y - 2, text, font, width, text_color),
-                                        "background": background_info}}
+                               "data": ((self.x + 3, self.y - 2, text, font, width, text_color), background_info)}
                     socket.send(str(message))
                 except socket.error:
                     pass

@@ -182,8 +182,8 @@ class ClientReceivingThread(threading.Thread):
                         self.last_draw.append(brush)
                         self.history.append(brush)
                     elif data["type"] == "textarea":
-                        text_data = data["data"]["text"]
-                        background_data = data["data"]["background"]
+                        text_data = data["data"][0]
+                        background_data = data["data"][1]
                         action = []
                         if background_data:
                             # add background for text
