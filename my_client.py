@@ -46,21 +46,18 @@ class ClientSettingWindow(Toplevel):
     def create_connection(self, event=None):
         host = self.host_name.get()
         if not host:
-            tkMessageBox.showinfo("Error", "Please enter a valid hostname!", parent=self)
-            self.parent.status["text"] = ""
+            self.status["text"] = "Please enter a valid hostname!"
             return
 
         port = self.port_number.get()
         if not port:
-            tkMessageBox.showinfo("Error", "Please enter a valid port number!", parent=self)
-            self.parent.status["text"] = ""
+            self.status["text"] = "Please enter a valid port number!"
             return
 
         try:
             port_number = int(port)
         except ValueError:
-            tkMessageBox.showinfo("Error", "Please enter a valid port number!", parent=self)
-            self.parent.status["text"] = ""
+            self.status["text"] = "Please enter a valid port number!"
             return
 
         settings["HOST"] = host
