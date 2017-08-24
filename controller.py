@@ -394,7 +394,7 @@ class SettingFrame(LabelFrame):
             label2 = Label(self, text="Dash Width")
             label2.pack(side=TOP, pady=(6, 0))
 
-            self.dash_width = Scale(self, from_=1, to=10, resolution=1, sliderlength=25, orient=HORIZONTAL,
+            self.dash_width = Scale(self, from_=1, to=5, resolution=1, sliderlength=25, orient=HORIZONTAL,
                                     command=self.set_dash_width)
             self.dash_width.set(settings["DASH_WIDTH"])
             self.dash_width.pack(side=TOP)
