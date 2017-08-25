@@ -4,8 +4,10 @@ import threading
 import time
 
 
-class App:
-    def __init__(self, t):
+class App(Tkinter.Tk):
+    def __init__(self):
+        Tkinter.Tk.__init__(self)
+
         self.status = False
         self.reverse = False
         self.r = random.randint(0, 255)
@@ -13,11 +15,11 @@ class App:
         self.b = random.randint(0, 255)
         self.image = self.generate_image()
 
-        self.c = Tkinter.Canvas(t, width=100, height=100)
+        self.c = Tkinter.Canvas(self, width=100, height=100)
         self.c.pack()
         self.i = self.c.create_image(0, 0, image=self.image, anchor=Tkinter.NW)
 
-        self.btn = Tkinter.Button(t, text="start", command=self.start)
+        self.btn = Tkinter.Button(self, text="start", command=self.start)
         self.btn.pack()
 
     def generate_image(self, image=None):
@@ -76,6 +78,5 @@ class App:
                 self.c.itemconfigure(self.i, image=self.parent.image)
 
 
-t = Tkinter.Tk()
-a = App(t)
-t.mainloop()
+a = App()
+a.mainloop()
