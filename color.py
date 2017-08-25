@@ -15,7 +15,8 @@ class App(Tkinter.Tk):
         self.b = random.randint(0, 255)
         self.x = 0
         self.y = 0
-        self.origin = 50
+        self.origin_x = 50
+        self.origin_y = 50
         self.image = self.generate_image()
 
         self.c = Tkinter.Canvas(self, width=100, height=100)
@@ -25,16 +26,30 @@ class App(Tkinter.Tk):
         self.btn = Tkinter.Button(self, text="start", command=self.start)
         self.btn.pack()
 
-        self.bind("<Up>", self.increase_origin)
-        self.bind("<Down>", self.decrease_origin)
+        self.bind("<Up>", self.move_up)
+        self.bind("<Down>", self.move_dowm)
+        self.bind("<Left>", self.move_left)
+        self.bind("<Right>", self.move_right)
+        self.c.bind("<Button-1>", self.set_origin)
 
-    def increase_origin(self, event):
-        if self.origin > 2:
-            self.origin -= 1
+    def move_up(self, event):
+        if self.origin_y < 99:
+            self.origin_y += 1
 
-    def decrease_origin(self, event):
-        if self.origin < 99:
-            self.origin += 1
+    def move_dowm(self, event):
+        if self.origin_y > 2:
+            self.origin_y -= 1
+
+    def move_left(self, event):
+        if self.origin_x > 1:
+            self.origin_x -= 1
+
+    def move_right(self, event):
+        if self.origin_x < 99:
+            self.origin_x += 1
+
+    def set_origin(self, event):
+        self.origin = event.y
 
     def generate_image(self):
         image = Tkinter.PhotoImage(width=100, height=100)
@@ -43,6 +58,10 @@ class App(Tkinter.Tk):
         col = 0
         for i in range(10000):
             image.put("#%02x%02x%02x" % (r, r, r), (row, col))
+            row += 1
+            if row == 100:
+                col += 1
+                row = 0
         return image
 
     def update_image(self, image=None):
@@ -54,14 +73,13 @@ class App(Tkinter.Tk):
         color = (self.r, self.r, self.r)
 
         self.x += 1
-
         if self.x == 100:
             self.x = 0
 
-            if not self.reverse:
-                self.r += 5
-            else:
+            if self.reverse:
                 self.r -= 5
+            else:
+                self.r += 5
 
             if self.r > 255:
                 self.r = 255
@@ -71,14 +89,8 @@ class App(Tkinter.Tk):
                 self.reverse = False
 
         for y in range(100):
-            if y == self.origin:
-                image.put("#00ff00", (self.x, y))
-            else:
-                image.put("#%02x%02x%02x" % color, (self.x, y))
-            if self.x+1 < 100:
-                image.put("#00ff00", (self.x+1, y))
-            else:
-                image.put("#00ff00", (0, y))
+            image.put("#%02x%02x%02x" % color, (self.x, y))
+
         self.image = image
 
     def start(self, *args):
